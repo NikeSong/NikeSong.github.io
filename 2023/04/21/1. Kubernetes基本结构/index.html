@@ -19,7 +19,7 @@
 
 	<!-- favicon -->
 	
-	<link rel="shortcut icon" href="/NikeSong/NikeSong/favicon.ico">
+	<link rel="shortcut icon" href="/favicon.ico">
 	
 
 
@@ -37,7 +37,7 @@
 
 
 	
-<link rel="stylesheet" href="/NikeSong/NikeSong/css/main.css">
+<link rel="stylesheet" href="/css/main.css">
 
 	
 <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -62,7 +62,7 @@
 <script src="https://cdn.jsdelivr.net/npm/jquery-pjax@2.0.1/jquery.pjax.min.js"></script>
 
 	
-<script src="/NikeSong/NikeSong/js/main.js"></script>
+<script src="/js/main.js"></script>
 
 
 	
@@ -79,7 +79,7 @@
 
 <body>
 	<header id="header">
-    <a id="title" href="/NikeSong/NikeSong/" class="logo">Hexo</a>
+    <a id="title" href="/" class="logo">Hexo</a>
 
 	<ul id="menu">
     
@@ -127,7 +127,7 @@
 			
 							<ul>
 								<li class="file">
-									<a href="/NikeSong/NikeSong/2023/04/20/0.%20K8s%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">
+									<a href="/2023/04/20/0.%20K8s%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">
                      
 										    K8s环境搭建
                      
@@ -138,7 +138,7 @@
 			
 							<ul>
 								<li class="file active">
-									<a href="/NikeSong/NikeSong/2023/04/21/1.%20Kubernetes%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84/">
+									<a href="/2023/04/21/1.%20Kubernetes%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84/">
                      
 										    Kubernetes基本结构
                      
@@ -149,7 +149,7 @@
 			
 							<ul>
 								<li class="file">
-									<a href="/NikeSong/NikeSong/2023/04/22/2.%20Pod%E5%92%8CPod%E6%8E%A7%E5%88%B6%E5%99%A8/">
+									<a href="/2023/04/22/2.%20Pod%E5%92%8CPod%E6%8E%A7%E5%88%B6%E5%99%A8/">
                      
 										    Pod和Pod控制器
                      
@@ -160,7 +160,7 @@
 			
 							<ul>
 								<li class="file">
-									<a href="/NikeSong/NikeSong/2023/04/18/hello-world/">
+									<a href="/2023/04/18/hello-world/">
                      
 										    Hello World
                      
@@ -218,21 +218,21 @@
 <p>q: 为什么是单数？</p>
 <p>因为在执行类似于投票的工作时双数会出现平票，单数避免了这样的问题。</p>
 </blockquote>
-<p><img src="/NikeSong/NikeSong/../images/s1.png" alt="s1"></p>
-<h2 id="结构拆解"><a href="#结构拆解" class="headerlink" title="结构拆解"></a>结构拆解</h2><p><img src="/NikeSong/NikeSong/../images/s2.png" alt="s2"></p>
+<p><img src="/../images/s1.png" alt="s1"></p>
+<h2 id="结构拆解"><a href="#结构拆解" class="headerlink" title="结构拆解"></a>结构拆解</h2><p><img src="/../images/s2.png" alt="s2"></p>
 <p><strong>首先从Node节点看起。</strong></p>
-<p><img src="/NikeSong/NikeSong/../images/s_node.png" alt="s_node"></p>
+<p><img src="/../images/s_node.png" alt="s_node"></p>
 <ul>
 <li>Node方块中的最小单位是Pod，Pod直译为豆荚，是K8s控制和调度的最小单位，也是一切工作的关注核心。理解为豆荚是非常直观的，因为这里面运行了一个个的容器，每个容器可以理解为一个豆子。容器中运行着我们部署的程序。看我下面画的是不是挺像豌豆 :-)</li>
 </ul>
-<p><img src="/NikeSong/NikeSong/../images/pod.png" alt="pod"></p>
+<p><img src="/../images/pod.png" alt="pod"></p>
 <ul>
 <li>为了实现pod的灵活控制，我们把pod做了分组，交由pod controller管理。pod controller其实是Master中的Controller Manager提供的功能。一个pod controller保存了其下属的pod的模板，拿到了pod controller我们就可以随意的创建、销毁、修改一组pod。当pod controller下属的pod被删除或者出故障后，pod controller会重建一个pod代替它。</li>
 <li>pod随时可能被销毁和重建，为了保证pod中应用程序的数据安全，把数据存储在pvc中。pvc它是k8s提供的存储服务，pvc中的数据未必就存储在当前机器上，它相当于是一个服务接口，其实现可以是各异的（类似于接口有很多实现类，用不同的方式实现了安全的存储，但是这些你无需关心，调接口用就完事了）。</li>
 <li>namespace的功能就是实现pod等资源的隔离，在某namespace中看不到其他namespace中的资源。</li>
 </ul>
 <p><strong>下面我们先换个角度，从Master看起。</strong></p>
-<p><img src="/NikeSong/NikeSong/../images/s_master.png" alt="s_master"></p>
+<p><img src="/../images/s_master.png" alt="s_master"></p>
 <ul>
 <li><p>Kubectl是我们控制集群的工具，Linux命令行交互工具。我们所有的控制命令都是通过这个组件下发到集群中的，这个组件在Master节点和Node节点上都可以存在，所以这里我把它画在了外部。</p>
 </li>
@@ -264,7 +264,7 @@
     <div class="post-guide">
         <div class="item left">
             
-              <a href="/NikeSong/NikeSong/2023/04/22/2.%20Pod%E5%92%8CPod%E6%8E%A7%E5%88%B6%E5%99%A8/">
+              <a href="/2023/04/22/2.%20Pod%E5%92%8CPod%E6%8E%A7%E5%88%B6%E5%99%A8/">
                   <i class="fa fa-angle-left" aria-hidden="true"></i>
                   Pod和Pod控制器
               </a>
@@ -272,7 +272,7 @@
         </div>
         <div class="item right">
             
-              <a href="/NikeSong/NikeSong/2023/04/20/0.%20K8s%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">
+              <a href="/2023/04/20/0.%20K8s%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">
                 K8s环境搭建
                 <i class="fa fa-angle-right" aria-hidden="true"></i>
               </a>

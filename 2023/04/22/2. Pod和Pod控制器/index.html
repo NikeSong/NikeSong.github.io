@@ -19,7 +19,7 @@
 
 	<!-- favicon -->
 	
-	<link rel="shortcut icon" href="/NikeSong/NikeSong/favicon.ico">
+	<link rel="shortcut icon" href="/favicon.ico">
 	
 
 
@@ -37,7 +37,7 @@
 
 
 	
-<link rel="stylesheet" href="/NikeSong/NikeSong/css/main.css">
+<link rel="stylesheet" href="/css/main.css">
 
 	
 <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -62,7 +62,7 @@
 <script src="https://cdn.jsdelivr.net/npm/jquery-pjax@2.0.1/jquery.pjax.min.js"></script>
 
 	
-<script src="/NikeSong/NikeSong/js/main.js"></script>
+<script src="/js/main.js"></script>
 
 
 	
@@ -79,7 +79,7 @@
 
 <body>
 	<header id="header">
-    <a id="title" href="/NikeSong/NikeSong/" class="logo">Hexo</a>
+    <a id="title" href="/" class="logo">Hexo</a>
 
 	<ul id="menu">
     
@@ -127,7 +127,7 @@
 			
 							<ul>
 								<li class="file">
-									<a href="/NikeSong/NikeSong/2023/04/20/0.%20K8s%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">
+									<a href="/2023/04/20/0.%20K8s%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">
                      
 										    K8s环境搭建
                      
@@ -138,7 +138,7 @@
 			
 							<ul>
 								<li class="file">
-									<a href="/NikeSong/NikeSong/2023/04/21/1.%20Kubernetes%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84/">
+									<a href="/2023/04/21/1.%20Kubernetes%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84/">
                      
 										    Kubernetes基本结构
                      
@@ -149,7 +149,7 @@
 			
 							<ul>
 								<li class="file active">
-									<a href="/NikeSong/NikeSong/2023/04/22/2.%20Pod%E5%92%8CPod%E6%8E%A7%E5%88%B6%E5%99%A8/">
+									<a href="/2023/04/22/2.%20Pod%E5%92%8CPod%E6%8E%A7%E5%88%B6%E5%99%A8/">
                      
 										    Pod和Pod控制器
                      
@@ -160,7 +160,7 @@
 			
 							<ul>
 								<li class="file">
-									<a href="/NikeSong/NikeSong/2023/04/18/hello-world/">
+									<a href="/2023/04/18/hello-world/">
                      
 										    Hello World
                      
@@ -212,7 +212,7 @@
 <!-- content -->
 <div id="article-content">
 	<h2 id="一、Pod"><a href="#一、Pod" class="headerlink" title="一、Pod"></a>一、Pod</h2><h3 id="1-Pause容器"><a href="#1-Pause容器" class="headerlink" title="1. Pause容器"></a>1. Pause容器</h3><p>上文我们说了Pod就像一个豆荚，里面运行着容器。这些容器里面有一个显得尤为特殊，它叫做Pause。</p>
-<p><img src="/NikeSong/NikeSong/../images/pod_pause.png" alt="pod_pause"></p>
+<p><img src="/../images/pod_pause.png" alt="pod_pause"></p>
 <p>Pause容器又叫根容器，它随Pod的建立而建立，其他pod都会从pause容器中fork出来。它掌握了此Pod的网络栈和存储资源。同一Pod的容器可以共享Pause的网络栈和Volume存储（Volume是Pod中能够被多个容器访问的共享目录），因此他们之间通信和数据交换更为高效，在设计时我们可以充分利用这一特性将一组密切相关的服务进程放入同一个Pod中。同一个Pod里的容器之间仅需通过localhost就能互相通信。</p>
 <h3 id="2-Pod的生命周期"><a href="#2-Pod的生命周期" class="headerlink" title="2. Pod的生命周期"></a>2. Pod的生命周期</h3><p>我们一般将pod对象从创建至终的这段时间范围称为pod的生命周期，它主要包含下面的过程：</p>
 <ul>
@@ -232,25 +232,25 @@
 </li>
 </ul>
 <p>下面逐一介绍各个过程中涉及到的技术细节，各个组件的配合实现方法。</p>
-<h4 id="2-1-Pod的创建"><a href="#2-1-Pod的创建" class="headerlink" title="2.1 Pod的创建"></a>2.1 Pod的创建</h4><p><img src="/NikeSong/NikeSong/../images/Pod_create.png" alt="Pod_create"></p>
+<h4 id="2-1-Pod的创建"><a href="#2-1-Pod的创建" class="headerlink" title="2.1 Pod的创建"></a>2.1 Pod的创建</h4><p><img src="/../images/Pod_create.png" alt="Pod_create"></p>
 <ul>
 <li><p>首先用户通过kubectl提交需要创建的pod信息给Api Server。</p>
 </li>
 <li><p>Api Server开始生成pod对象的信息，并将信息存入etcd，然后立即返回确认信息至客户端。</p>
 </li>
 </ul>
-<p><img src="/NikeSong/NikeSong/../images/pod_init.png" alt="pod_init"></p>
+<p><img src="/../images/pod_init.png" alt="pod_init"></p>
 <ul>
 <li>Api Server开始读取etcd中的Pod信息，反映其中pod对象的变化，其它组件使用watch机制来跟踪检查Api Server上的变动。</li>
 </ul>
-<p><img src="/NikeSong/NikeSong/../images/pod_init2.png" alt="pod_init2"></p>
+<p><img src="/../images/pod_init2.png" alt="pod_init2"></p>
 <ul>
 <li><p>scheduler发现有新的pod对象要创建，开始为Pod分配主机并将结果信息更新至Api Server。</p>
 </li>
 <li><p>node节点上的kubelet发现有pod调度过来，开始工作。</p>
 </li>
 </ul>
-<p><img src="/NikeSong/NikeSong/../images/pod_init3.png" alt="pod_init3"></p>
+<p><img src="/../images/pod_init3.png" alt="pod_init3"></p>
 <ul>
 <li>Kubelet尝试创建容器，并将创建结果回送至Api Server。</li>
 <li>Api Server将接收到的pod状态信息存入etcd中。</li>
@@ -264,7 +264,7 @@
 <li>失败（Failed）：所有容器都已经终止，但至少有一个容器终止失败，即容器返回了非0值的退出状态</li>
 <li>未知（Unknown）：apiserver无法正常获取到pod对象的状态信息，通常由网络通信失败所导致</li>
 </ul>
-<p><img src="/NikeSong/NikeSong/../images/lifetime.png" alt="lifetime"></p>
+<p><img src="/../images/lifetime.png" alt="lifetime"></p>
 <p><strong>初始化容器</strong></p>
 <p>初始化容器是在pod的主容器启动之前要运行的容器，可以有一个或者多个。它主要是做一些主容器的前置工作，具有两大特征：</p>
 <ol>
@@ -293,7 +293,7 @@
 <li>Never ： 不论状态为何，都不重启该容器</li>
 </ul>
 <p>​    重启策略适用于pod对象中的所有容器，首次需要重启的容器，将在其需要时立即进行重启，随后再次需要重启的操作将由kubelet延迟一段时间后进行，且反复的重启操作的延迟时长以此为10s、20s、40s、80s、160s和300s，300s是最大延迟时长。</p>
-<h4 id="2-3-Pod的终止过程"><a href="#2-3-Pod的终止过程" class="headerlink" title="2.3 Pod的终止过程"></a>2.3 Pod的终止过程</h4><p><img src="/NikeSong/NikeSong/../images/pod_dead.png" alt="pod_dead"></p>
+<h4 id="2-3-Pod的终止过程"><a href="#2-3-Pod的终止过程" class="headerlink" title="2.3 Pod的终止过程"></a>2.3 Pod的终止过程</h4><p><img src="/../images/pod_dead.png" alt="pod_dead"></p>
 <p>这个过程同样是Master中各个组件合作完成的，此处不再做细节展示。</p>
 <ol>
 <li>用户向Api Server发送删除pod对象的命令。</li>
@@ -317,7 +317,7 @@
         </div>
         <div class="item right">
             
-              <a href="/NikeSong/NikeSong/2023/04/21/1.%20Kubernetes%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84/">
+              <a href="/2023/04/21/1.%20Kubernetes%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84/">
                 Kubernetes基本结构
                 <i class="fa fa-angle-right" aria-hidden="true"></i>
               </a>
