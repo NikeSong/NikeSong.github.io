@@ -9,7 +9,7 @@
 	
 	<title>
 	
-		Hello World | 
+		Pod和Pod控制器 | 
 	 
 	Hexo
 	</title>
@@ -127,18 +127,7 @@
 			
 							<ul>
 								<li class="file">
-									<a href="/2023/04/20/0.%20K8s%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">
-                     
-										    K8s环境搭建
-                     
-									</a>
-								</li>
-								<div class="article-toc" style="display: none;"></div>
-							</ul>
-			
-							<ul>
-								<li class="file">
-									<a href="/2023/04/21/1.%20Kubernetes%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84/">
+									<a href="/2023/04/21/1.%20Kubernetes%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/">
                      
 										    Kubernetes基本结构
                      
@@ -148,8 +137,8 @@
 							</ul>
 			
 							<ul>
-								<li class="file">
-									<a href="/2023/04/22/2.%20Pod%E5%92%8CPod%E6%8E%A7%E5%88%B6%E5%99%A8/">
+								<li class="file active">
+									<a href="/2023/04/22/10.%20Operator%E5%BC%80%E5%8F%91/">
                      
 										    Pod和Pod控制器
                      
@@ -159,10 +148,54 @@
 							</ul>
 			
 							<ul>
-								<li class="file active">
-									<a href="/2023/04/18/hello-world/">
+								<li class="file">
+									<a href="/2023/04/22/11.%20Flink/">
                      
-										    Hello World
+										    Pod和Pod控制器
+                     
+									</a>
+								</li>
+								<div class="article-toc" style="display: none;"></div>
+							</ul>
+			
+							<ul>
+								<li class="file">
+									<a href="/2023/04/22/2.%20Pod%E7%BB%86%E8%8A%82%E5%88%86%E6%9E%90/">
+                     
+										    Pod细节分析
+                     
+									</a>
+								</li>
+								<div class="article-toc" style="display: none;"></div>
+							</ul>
+			
+							<ul>
+								<li class="file">
+									<a href="/2023/04/23/4.%20K8s%E6%9C%8D%E5%8A%A1%E6%9A%B4%E9%9C%B2/">
+                     
+										    K8s服务暴露
+                     
+									</a>
+								</li>
+								<div class="article-toc" style="display: none;"></div>
+							</ul>
+			
+							<ul>
+								<li class="file">
+									<a href="/2023/04/22/7.%20%E6%8E%A2%E7%A7%98Docker%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/">
+                     
+										    Pod和Pod控制器
+                     
+									</a>
+								</li>
+								<div class="article-toc" style="display: none;"></div>
+							</ul>
+			
+							<ul>
+								<li class="file">
+									<a href="/2023/04/22/hello-world/">
+                     
+										    Pod和Pod控制器
                      
 									</a>
 								</li>
@@ -176,7 +209,7 @@
 	<!-- 引入正文 -->
 	<div id="content">
 		<h1 id="article-title">
-	Hello World
+	Pod和Pod控制器
 </h1>
 
 <!-- meta -->
@@ -184,11 +217,20 @@
 	
 
 	<span>John Doe</span>
-	<span>2023-04-18 16:17:24</span>
+	<span>2023-04-22 13:10:00</span>
 
   <div id="article-categories">
     
 		  <span>Categories：</span>
+      
+          
+              <span>
+                  <i class="fa fa-folder" aria-hidden="true">
+                  <a href="/categories/Kubernetes学习笔记/">Kubernetes学习笔记</a>
+                  </i>
+                
+              </span>
+          
       
     
 
@@ -202,19 +244,11 @@
 
 <!-- content -->
 <div id="article-content">
-	<p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+	<blockquote>
+<p>Notes：</p>
+<p>以上内容均为个人学习过程中的理解，理解和总结可能有偏差。文章内容会随着学习过程不断修改完善。</p>
+<p>如果以上有错误欢迎指出。</p>
+</blockquote>
 
 </div>
 
@@ -223,13 +257,18 @@
     <div class="post-guide">
         <div class="item left">
             
-              <a href="/2023/04/20/0.%20K8s%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">
+              <a href="/2023/04/23/4.%20K8s%E6%9C%8D%E5%8A%A1%E6%9A%B4%E9%9C%B2/">
                   <i class="fa fa-angle-left" aria-hidden="true"></i>
-                  K8s环境搭建
+                  K8s服务暴露
               </a>
             
         </div>
         <div class="item right">
+            
+              <a href="/2023/04/22/11.%20Flink/">
+                Pod和Pod控制器
+                <i class="fa fa-angle-right" aria-hidden="true"></i>
+              </a>
             
         </div>
     </div>

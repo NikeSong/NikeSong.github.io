@@ -127,18 +127,7 @@
 			
 							<ul>
 								<li class="file">
-									<a href="/2023/04/20/0.%20K8s%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">
-                     
-										    K8s环境搭建
-                     
-									</a>
-								</li>
-								<div class="article-toc" style="display: none;"></div>
-							</ul>
-			
-							<ul>
-								<li class="file">
-									<a href="/2023/04/21/1.%20Kubernetes%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84/">
+									<a href="/2023/04/21/1.%20Kubernetes%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/">
                      
 										    Kubernetes基本结构
                      
@@ -148,8 +137,8 @@
 							</ul>
 			
 							<ul>
-								<li class="file active">
-									<a href="/2023/04/22/2.%20Pod%E5%92%8CPod%E6%8E%A7%E5%88%B6%E5%99%A8/">
+								<li class="file">
+									<a href="/2023/04/22/10.%20Operator%E5%BC%80%E5%8F%91/">
                      
 										    Pod和Pod控制器
                      
@@ -160,9 +149,53 @@
 			
 							<ul>
 								<li class="file">
-									<a href="/2023/04/18/hello-world/">
+									<a href="/2023/04/22/11.%20Flink/">
                      
-										    Hello World
+										    Pod和Pod控制器
+                     
+									</a>
+								</li>
+								<div class="article-toc" style="display: none;"></div>
+							</ul>
+			
+							<ul>
+								<li class="file">
+									<a href="/2023/04/22/2.%20Pod%E7%BB%86%E8%8A%82%E5%88%86%E6%9E%90/">
+                     
+										    Pod细节分析
+                     
+									</a>
+								</li>
+								<div class="article-toc" style="display: none;"></div>
+							</ul>
+			
+							<ul>
+								<li class="file">
+									<a href="/2023/04/23/4.%20K8s%E6%9C%8D%E5%8A%A1%E6%9A%B4%E9%9C%B2/">
+                     
+										    K8s服务暴露
+                     
+									</a>
+								</li>
+								<div class="article-toc" style="display: none;"></div>
+							</ul>
+			
+							<ul>
+								<li class="file active">
+									<a href="/2023/04/22/7.%20%E6%8E%A2%E7%A7%98Docker%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/">
+                     
+										    Pod和Pod控制器
+                     
+									</a>
+								</li>
+								<div class="article-toc" style="display: none;"></div>
+							</ul>
+			
+							<ul>
+								<li class="file">
+									<a href="/2023/04/22/hello-world/">
+                     
+										    Pod和Pod控制器
                      
 									</a>
 								</li>
@@ -293,20 +326,37 @@
 <li>Never ： 不论状态为何，都不重启该容器</li>
 </ul>
 <p>​    重启策略适用于pod对象中的所有容器，首次需要重启的容器，将在其需要时立即进行重启，随后再次需要重启的操作将由kubelet延迟一段时间后进行，且反复的重启操作的延迟时长以此为10s、20s、40s、80s、160s和300s，300s是最大延迟时长。</p>
-<h4 id="2-3-Pod的终止过程"><a href="#2-3-Pod的终止过程" class="headerlink" title="2.3 Pod的终止过程"></a>2.3 Pod的终止过程</h4><p><img src="/../images/pod_dead.png" alt="pod_dead"></p>
+<h4 id="2-3-Pod的终止过程"><a href="#2-3-Pod的终止过程" class="headerlink" title="2.3 Pod的终止过程"></a>2.3 Pod的终止过程</h4><p><img src="/../images/pod_terminate.png" alt="pod_terminate"></p>
 <p>这个过程同样是Master中各个组件合作完成的，此处不再做细节展示。</p>
-<ol>
-<li>用户向Api Server发送删除pod对象的命令。</li>
-<li>Api Servcer中的pod对象信息会随着时间的推移而更新，在宽限期内（默认30s），pod被视为dead。</li>
-<li>将pod标记为terminating状态。</li>
-<li>kubelet在监控到pod对象转为terminating状态的同时启动pod关闭过程。</li>
-<li>端点控制器监控到pod对象的关闭行为时将其从所有匹配到此端点的service资源的端点列表中移除。</li>
-<li>如果当前pod对象定义了preStop钩子处理器，则在其标记为terminating后即会以同步的方式启动执行。</li>
-<li>pod对象中的容器进程收到停止信号。</li>
-<li>宽限期结束后，若pod中还存在仍在运行的进程，那么pod对象会收到立即终止的信号。</li>
-<li>kubelet请求Api Server将此pod资源的宽限期设置为0从而完成删除操作，此时pod对于用户已不可见。</li>
-</ol>
-<h2 id="二、Pod控制器"><a href="#二、Pod控制器" class="headerlink" title="二、Pod控制器"></a>二、Pod控制器</h2>
+<ul>
+<li><p>用户向Api Server发送删除pod对象的命令。</p>
+</li>
+<li><p>Api Servcer中的pod对象信息会随着时间的推移而更新，在宽限期内（默认30s），pod被视为dead。</p>
+</li>
+<li><p>将pod标记为terminating状态。</p>
+</li>
+</ul>
+<p><img src="/../images/pod_terminate3.png" alt="pod_terminate3"></p>
+<ul>
+<li><p>kubelet在监控到pod对象转为terminating状态的同时启动pod关闭过程。</p>
+</li>
+<li><p>端点控制器监控到pod对象的关闭行为时将其从所有匹配到此端点的service资源的端点列表中移除。</p>
+</li>
+<li><p>如果当前pod对象定义了preStop钩子处理器，则在其标记为terminating后即会以同步的方式启动执行。</p>
+</li>
+<li><p>pod对象中的容器进程收到停止信号。</p>
+</li>
+<li><p>宽限期结束后，若pod中还存在仍在运行的进程，那么pod对象会收到立即终止的信号。</p>
+</li>
+<li><p>kubelet请求Api Server将此pod资源的宽限期设置为0从而完成删除操作，此时pod对于用户已不可见。</p>
+</li>
+</ul>
+<h3 id="3-Pod的调度"><a href="#3-Pod的调度" class="headerlink" title="3. Pod的调度"></a>3. Pod的调度</h3><h2 id="二、Pod控制器"><a href="#二、Pod控制器" class="headerlink" title="二、Pod控制器"></a>二、Pod控制器</h2><blockquote>
+<p>Notes：</p>
+<p>以上内容均为个人学习过程中的理解，理解和总结可能有偏差。文章内容会随着学习过程不断修改完善。</p>
+<p>如果以上有错误欢迎指出。</p>
+</blockquote>
+
 </div>
 
 <!-- post-guide -->
@@ -314,11 +364,16 @@
     <div class="post-guide">
         <div class="item left">
             
+              <a href="/2023/04/22/2.%20Pod%E7%BB%86%E8%8A%82%E5%88%86%E6%9E%90/">
+                  <i class="fa fa-angle-left" aria-hidden="true"></i>
+                  Pod细节分析
+              </a>
+            
         </div>
         <div class="item right">
             
-              <a href="/2023/04/21/1.%20Kubernetes%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84/">
-                Kubernetes基本结构
+              <a href="/2023/04/22/hello-world/">
+                Pod和Pod控制器
                 <i class="fa fa-angle-right" aria-hidden="true"></i>
               </a>
             

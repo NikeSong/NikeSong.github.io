@@ -9,7 +9,7 @@
 	
 	<title>
 	
-		K8s环境搭建 | 
+		Pod和Pod控制器 | 
 	 
 	Hexo
 	</title>
@@ -126,19 +126,8 @@
 
 			
 							<ul>
-								<li class="file active">
-									<a href="/2023/04/20/0.%20K8s%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">
-                     
-										    K8s环境搭建
-                     
-									</a>
-								</li>
-								<div class="article-toc" style="display: none;"></div>
-							</ul>
-			
-							<ul>
 								<li class="file">
-									<a href="/2023/04/21/1.%20Kubernetes%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84/">
+									<a href="/2023/04/21/1.%20Kubernetes%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/">
                      
 										    Kubernetes基本结构
                      
@@ -149,7 +138,18 @@
 			
 							<ul>
 								<li class="file">
-									<a href="/2023/04/22/2.%20Pod%E5%92%8CPod%E6%8E%A7%E5%88%B6%E5%99%A8/">
+									<a href="/2023/04/22/10.%20Operator%E5%BC%80%E5%8F%91/">
+                     
+										    Pod和Pod控制器
+                     
+									</a>
+								</li>
+								<div class="article-toc" style="display: none;"></div>
+							</ul>
+			
+							<ul>
+								<li class="file active">
+									<a href="/2023/04/22/11.%20Flink/">
                      
 										    Pod和Pod控制器
                      
@@ -160,9 +160,42 @@
 			
 							<ul>
 								<li class="file">
-									<a href="/2023/04/18/hello-world/">
+									<a href="/2023/04/22/2.%20Pod%E7%BB%86%E8%8A%82%E5%88%86%E6%9E%90/">
                      
-										    Hello World
+										    Pod细节分析
+                     
+									</a>
+								</li>
+								<div class="article-toc" style="display: none;"></div>
+							</ul>
+			
+							<ul>
+								<li class="file">
+									<a href="/2023/04/23/4.%20K8s%E6%9C%8D%E5%8A%A1%E6%9A%B4%E9%9C%B2/">
+                     
+										    K8s服务暴露
+                     
+									</a>
+								</li>
+								<div class="article-toc" style="display: none;"></div>
+							</ul>
+			
+							<ul>
+								<li class="file">
+									<a href="/2023/04/22/7.%20%E6%8E%A2%E7%A7%98Docker%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/">
+                     
+										    Pod和Pod控制器
+                     
+									</a>
+								</li>
+								<div class="article-toc" style="display: none;"></div>
+							</ul>
+			
+							<ul>
+								<li class="file">
+									<a href="/2023/04/22/hello-world/">
+                     
+										    Pod和Pod控制器
                      
 									</a>
 								</li>
@@ -176,7 +209,7 @@
 	<!-- 引入正文 -->
 	<div id="content">
 		<h1 id="article-title">
-	K8s环境搭建
+	Pod和Pod控制器
 </h1>
 
 <!-- meta -->
@@ -184,7 +217,7 @@
 	
 
 	<span>John Doe</span>
-	<span>2023-04-20 13:10:00</span>
+	<span>2023-04-22 13:10:00</span>
 
   <div id="article-categories">
     
@@ -211,45 +244,11 @@
 
 <!-- content -->
 <div id="article-content">
-	<h3 id="虚拟机安装"><a href="#虚拟机安装" class="headerlink" title="虚拟机安装"></a>虚拟机安装</h3><p>下载vmware，新建虚拟机，</p>
-<p>建立好之后编辑虚拟机设置，把cd&#x2F;dvd，使用镜像文件，选择找到文件，确定</p>
-<p>打开虚拟机，安装系统，</p>
-<p>语言中文简体，继续，</p>
-<p>等待一会，点击软件选择，基础设置服务器，完成。</p>
-<p>点进去安装位置，在点出来。</p>
-<p>网络和主机名，点进去，点配置。</p>
-<p>常规，可用时自动链接到XX选上。</p>
-<p>选ipv4设置，方法为手动，下面表，add，此时需要输入地址，这个地址必须在你网段里。人与人之间不同。设置地址为xxx.xxx.xxx.100，子网掩码就是255.255.255.0，网关：xxx.xxx.xxx.2</p>
-<p>（192.168.62.0）</p>
-<p>查看网段：点击编辑，虚拟网络编辑器，net模式那个，看子网ip，那就是网段。这个网段最后一个数字不要是2，因为2是网关，最好100以后.</p>
-<p>DNS服务器，用阿里的，223.5.5.5</p>
-<p>保存。</p>
-<p>最后是显示概览，把主机名改为master，应用</p>
-<p>点开始安装。</p>
-<p>设置root密码，双击输入</p>
-<h3 id="虚拟机配置"><a href="#虚拟机配置" class="headerlink" title="虚拟机配置"></a>虚拟机配置</h3><p>安装 <a target="_blank" rel="noopener" href="https://mobaxterm.mobatek.net/download-home-edition.html">https://mobaxterm.mobatek.net/download-home-edition.html</a></p>
-<p>quick connect，输入ip，选择扳手ssh</p>
-<p>执行三个，输入账号密码</p>
-<p>[root@master ~]# cat &#x2F;etc&#x2F;redhat-release<br>CentOS Linux release 7.9.2009 (Core)</p>
-<p>必须是7.5之上</p>
-<p>设置主机名解析</p>
-<p>（以下只是测试环境的用法，企业中使用dns解析服务器）</p>
-<p>vim &#x2F;etc&#x2F;hosts</p>
-<p>新增一行（光标移动到最后，点o则新增一行）</p>
-<p>192.168.62.100 master</p>
-<p>192.168.62.101 node1</p>
-<p>192.168.62.102 node2</p>
-<p>vim使用方式：</p>
-<p>i为编辑，编辑完后按esc退出编辑。命令以：开头，q为不保存退出，wq为保存退出，写命令后按回车</p>
-<p>时间同步</p>
-<p>使用chronyd服务从网络同步时间，企业中会有内部的时间同步服务器</p>
-<p>[root@master ~]# systemctl start chronyd<br>[root@master ~]# systemctl enable chronyd<br>[root@master ~]# date<br>2023年 04月 19日 星期三 19:05:07 CST</p>
-<p>时间不同步原因分析：</p>
-<p>看<a target="_blank" rel="noopener" href="https://blog.csdn.net/GUY_GO/article/details/86149189">https://blog.csdn.net/GUY_GO/article/details/86149189</a></p>
-<p>ping不到外网</p>
-<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/S1901/article/details/119878929">https://blog.csdn.net/S1901/article/details/119878929</a></p>
-<p>为什么ifconfig命令看，时不时就没有inet了？</p>
-<p>如果没有就service network restart</p>
+	<blockquote>
+<p>Notes：</p>
+<p>以上内容均为个人学习过程中的理解，理解和总结可能有偏差。文章内容会随着学习过程不断修改完善。</p>
+<p>如果以上有错误欢迎指出。</p>
+</blockquote>
 
 </div>
 
@@ -258,16 +257,16 @@
     <div class="post-guide">
         <div class="item left">
             
-              <a href="/2023/04/21/1.%20Kubernetes%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84/">
+              <a href="/2023/04/22/10.%20Operator%E5%BC%80%E5%8F%91/">
                   <i class="fa fa-angle-left" aria-hidden="true"></i>
-                  Kubernetes基本结构
+                  Pod和Pod控制器
               </a>
             
         </div>
         <div class="item right">
             
-              <a href="/2023/04/18/hello-world/">
-                Hello World
+              <a href="/2023/04/22/2.%20Pod%E7%BB%86%E8%8A%82%E5%88%86%E6%9E%90/">
+                Pod细节分析
                 <i class="fa fa-angle-right" aria-hidden="true"></i>
               </a>
             

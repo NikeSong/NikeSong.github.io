@@ -126,19 +126,8 @@
 
 			
 							<ul>
-								<li class="file">
-									<a href="/2023/04/20/0.%20K8s%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">
-                     
-										    K8s环境搭建
-                     
-									</a>
-								</li>
-								<div class="article-toc" style="display: none;"></div>
-							</ul>
-			
-							<ul>
 								<li class="file active">
-									<a href="/2023/04/21/1.%20Kubernetes%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84/">
+									<a href="/2023/04/21/1.%20Kubernetes%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/">
                      
 										    Kubernetes基本结构
                      
@@ -149,7 +138,7 @@
 			
 							<ul>
 								<li class="file">
-									<a href="/2023/04/22/2.%20Pod%E5%92%8CPod%E6%8E%A7%E5%88%B6%E5%99%A8/">
+									<a href="/2023/04/22/10.%20Operator%E5%BC%80%E5%8F%91/">
                      
 										    Pod和Pod控制器
                      
@@ -160,9 +149,53 @@
 			
 							<ul>
 								<li class="file">
-									<a href="/2023/04/18/hello-world/">
+									<a href="/2023/04/22/11.%20Flink/">
                      
-										    Hello World
+										    Pod和Pod控制器
+                     
+									</a>
+								</li>
+								<div class="article-toc" style="display: none;"></div>
+							</ul>
+			
+							<ul>
+								<li class="file">
+									<a href="/2023/04/22/2.%20Pod%E7%BB%86%E8%8A%82%E5%88%86%E6%9E%90/">
+                     
+										    Pod细节分析
+                     
+									</a>
+								</li>
+								<div class="article-toc" style="display: none;"></div>
+							</ul>
+			
+							<ul>
+								<li class="file">
+									<a href="/2023/04/23/4.%20K8s%E6%9C%8D%E5%8A%A1%E6%9A%B4%E9%9C%B2/">
+                     
+										    K8s服务暴露
+                     
+									</a>
+								</li>
+								<div class="article-toc" style="display: none;"></div>
+							</ul>
+			
+							<ul>
+								<li class="file">
+									<a href="/2023/04/22/7.%20%E6%8E%A2%E7%A7%98Docker%E5%AE%B9%E5%99%A8%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/">
+                     
+										    Pod和Pod控制器
+                     
+									</a>
+								</li>
+								<div class="article-toc" style="display: none;"></div>
+							</ul>
+			
+							<ul>
+								<li class="file">
+									<a href="/2023/04/22/hello-world/">
+                     
+										    Pod和Pod控制器
                      
 									</a>
 								</li>
@@ -211,7 +244,7 @@
 
 <!-- content -->
 <div id="article-content">
-	<h2 id="基本组成"><a href="#基本组成" class="headerlink" title="基本组成"></a>基本组成</h2><p>首先，一个基本的Kubernetes集群由若干个Master节点和若干个Node节点组成。Master相当于集群的大脑，做集群的规划和控制，核心的控制组件都会部署到Mater节点上。Node节点是实际运行程序的工作节点。</p>
+	<h2 id="1-基本组成"><a href="#1-基本组成" class="headerlink" title="1 基本组成"></a>1 基本组成</h2><p>首先，一个基本的Kubernetes集群由若干个Master节点和若干个Node节点组成。Master相当于集群的大脑，做集群的规划和控制，核心的控制组件都会部署到Mater节点上。Node节点是实际运行程序的工作节点。</p>
 <blockquote>
 <p>q: 大脑一个不就够了吗？</p>
 <p>如果一个集群只有一个Master，那么如果这个Master故障后整个集群的工作都会不正常，是不合理的。一般Master节点数目设置为大于1的单数。</p>
@@ -219,7 +252,7 @@
 <p>因为在执行类似于投票的工作时双数会出现平票，单数避免了这样的问题。</p>
 </blockquote>
 <p><img src="/../images/s1.png" alt="s1"></p>
-<h2 id="结构拆解"><a href="#结构拆解" class="headerlink" title="结构拆解"></a>结构拆解</h2><p><img src="/../images/s2.png" alt="s2"></p>
+<h2 id="2-结构拆解"><a href="#2-结构拆解" class="headerlink" title="2 结构拆解"></a>2 结构拆解</h2><h3 id="2-1-结构分析"><a href="#2-1-结构分析" class="headerlink" title="2.1 结构分析"></a>2.1 结构分析</h3><p><img src="/../images/s2.png" alt="s2"></p>
 <p><strong>首先从Node节点看起。</strong></p>
 <p><img src="/../images/s_node.png" alt="s_node"></p>
 <ul>
@@ -234,14 +267,10 @@
 <p><strong>下面我们先换个角度，从Master看起。</strong></p>
 <p><img src="/../images/s_master.png" alt="s_master"></p>
 <ul>
-<li><p>Kubectl是我们控制集群的工具，Linux命令行交互工具。我们所有的控制命令都是通过这个组件下发到集群中的，这个组件在Master节点和Node节点上都可以存在，所以这里我把它画在了外部。</p>
-</li>
-<li><p>Api server是Master中最核心的控制组件，其他组件都需要通过和他做交互实现相应的功能。这里的“功能”几乎涉及了k8s的各种服务，比如pod的创建、销毁、调度，服务的暴露等（相关概念后面的文章中会介绍）。</p>
-</li>
-<li><p>Controller Manager就是Node中Pod Controller功能的实现根基。</p>
-</li>
-<li><p>Scheduler是任务调度器，分发任务给node，提供了很多的任务分发策略，细节在后面文章中展开。</p>
-</li>
+<li>Kubectl是我们控制集群的工具，Linux命令行交互工具。我们所有的控制命令都是通过这个组件下发到集群中的，这个组件在Master节点和Node节点上都可以存在，所以这里我把它画在了外部。</li>
+<li>Api server是Master中最核心的控制组件，其他组件都需要通过和他做交互实现相应的功能。这里的“功能”几乎涉及了k8s的各种服务，比如pod的创建、销毁、调度，服务的暴露等（相关概念后面的文章中会介绍）。</li>
+<li>Controller Manager就是Node中Pod Controller功能的实现根基。</li>
+<li>Scheduler是任务调度器，分发任务给node，提供了很多的任务分发策略，细节在后面文章中展开。</li>
 </ul>
 <blockquote>
 <p>这里我认为Node中的很多功能都是依托于Scheduler和Controller Manager实现的，如负载均衡、缺陷和容忍、亲和性、Pod Controller中的很多功能等。</p>
@@ -251,6 +280,10 @@
 <li>再看Kubelet，它是Api Server把“大脑”得到的结论付诸实践的工具，Master对Node中pod等资源的操作都是通过它实现的。</li>
 <li>Kube Proxy是Node中Pod的代理，它负责把Pod中应用提供的服务暴露出去。比如我们将应用部署到集群后，通过浏览器中输入ip加端口号就可以访问这项服务，这是Kube Proxy的功劳。</li>
 </ul>
+<h3 id="2-2-结构观察"><a href="#2-2-结构观察" class="headerlink" title="2.2 结构观察"></a>2.2 结构观察</h3><p>我们可以观察在Master中上述各节点，他们都是以Pod形式运行在一个叫做kube-system的namespace中，我们可以用如下方式查看。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[root@master ~]# kubectl get pod -n kube-system</span><br><span class="line">NAMESPACE     NAME                             READY   STATUS    RESTARTS   AGE</span><br><span class="line">kube-system   coredns-6955765f44-68g6v         1/1     Running   0          2d1h</span><br><span class="line">kube-system   coredns-6955765f44-cs5r8         1/1     Running   0          2d1h</span><br><span class="line">kube-system   etcd-master                      1/1     Running   0          2d1h</span><br><span class="line">kube-system   kube-apiserver-master            1/1     Running   0          2d1h</span><br><span class="line">kube-system   kube-controller-manager-master   1/1     Running   0          2d1h</span><br><span class="line">kube-system   kube-flannel-ds-amd64-47r25      1/1     Running   0          2d1h</span><br><span class="line">kube-system   kube-flannel-ds-amd64-ls5lh      1/1     Running   0          2d1h</span><br><span class="line">kube-system   kube-proxy-685tk                 1/1     Running   0          2d1h</span><br><span class="line">kube-system   kube-proxy-87spt                 1/1     Running   0          2d1h</span><br><span class="line">kube-system   kube-scheduler-master            1/1     Running   0          2d1h</span><br></pre></td></tr></table></figure>
+
+<p>其中coredns等两个是专门用于域名解析的Pod，在此处不深究。kube-flannel则是专门用于网络通信的，此外其他的Pod均可以在里面找到。</p>
 <blockquote>
 <p>Notes：</p>
 <p>以上内容均为个人学习过程中的理解，理解和总结可能有偏差。文章内容会随着学习过程不断修改完善。</p>
@@ -264,18 +297,13 @@
     <div class="post-guide">
         <div class="item left">
             
-              <a href="/2023/04/22/2.%20Pod%E5%92%8CPod%E6%8E%A7%E5%88%B6%E5%99%A8/">
+              <a href="/2023/04/22/hello-world/">
                   <i class="fa fa-angle-left" aria-hidden="true"></i>
                   Pod和Pod控制器
               </a>
             
         </div>
         <div class="item right">
-            
-              <a href="/2023/04/20/0.%20K8s%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/">
-                K8s环境搭建
-                <i class="fa fa-angle-right" aria-hidden="true"></i>
-              </a>
             
         </div>
     </div>
