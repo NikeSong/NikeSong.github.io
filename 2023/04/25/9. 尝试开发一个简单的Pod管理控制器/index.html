@@ -258,7 +258,7 @@
 <div id="article-content">
 	<h2 id="开发一个Pod管理控制器"><a href="#开发一个Pod管理控制器" class="headerlink" title="开发一个Pod管理控制器"></a>开发一个Pod管理控制器</h2><h3 id="1-开发目标"><a href="#1-开发目标" class="headerlink" title="1. 开发目标"></a>1. 开发目标</h3><p>类比于Deployment可以管理Pod，我们现在尝试开发一个简单的Pod管理控制器Application Operator，但是暂时只支持Pod副本数的管理。</p>
 <p>我们要通过一个Application类型来定义一个自己的资源对象，然后在控制器中获取这个资源对象的详细配置，接着根据它的配置去创建相应数量的Pod，就像De-ployment那样工作。当然，为了避免Demo项目过于复杂，这里不去考虑过多的异常处理、程序健壮性、业务逻辑完备等。</p>
-<img src="../images/application_operator_function.png" alt="application_operator_function" style="zoom:50%;" />
+<img src="../images/application_operator_function.png" style="zoom:50%;" />
 
 
 
@@ -441,7 +441,7 @@
 <h3 id="8-资源清理"><a href="#8-资源清理" class="headerlink" title="8. 资源清理"></a>8. 资源清理</h3><p>前面我们通过几个步骤分别部署了CRD、CR和Controller，这时环境中新增的资源不少（各种rbac相关的、部署相关的资源），如果这些资源都用kubectl一个一个来清理，还是很痛苦的。同样，清理的步骤也可以通过Makefile来实现：</p>
 <p>卸载Controller：<code>make undeploy</code></p>
 <p>卸载CRD：<code>make uninstall</code></p>
-<h3 id="9-总结与理解"><a href="#9-总结与理解" class="headerlink" title="9.总结与理解"></a>9.总结与理解</h3><img src="../images/summarize_helloworld.png" alt="summarize_helloworld" style="zoom:80%;" />
+<h3 id="9-总结与理解"><a href="#9-总结与理解" class="headerlink" title="9.总结与理解"></a>9.总结与理解</h3><img src="../images/summarize_helloworld.png" style="zoom:80%;" />
 
 
 
