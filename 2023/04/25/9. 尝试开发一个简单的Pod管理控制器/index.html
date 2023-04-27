@@ -78,8 +78,7 @@
 <meta name="generator" content="Hexo 6.3.0"></head>
 
 <body>
-	
-<header id="header">
+	<header id="header">
     <a id="title" href="/" class="logo">Hexo</a>
 
 	<ul id="menu">
@@ -94,13 +93,13 @@
       
         <li class="menu-item">
           <a href='https://github.com/NikeSong' class="menu-item-link" target="_blank">
-            Tree
+            Nicolson
           </a>
         </li>
       
         <li class="menu-item">
           <a href='https://github.com/NikeSong' class="menu-item-link" target="_blank">
-            UidGenerator
+            Nicolson
           </a>
         </li>
       
@@ -247,10 +246,7 @@
 <div id="article-content">
 	<h2 id="开发一个Pod管理控制器"><a href="#开发一个Pod管理控制器" class="headerlink" title="开发一个Pod管理控制器"></a>开发一个Pod管理控制器</h2><h3 id="1-开发目标"><a href="#1-开发目标" class="headerlink" title="1. 开发目标"></a>1. 开发目标</h3><p>类比于Deployment可以管理Pod，我们现在尝试开发一个简单的Pod管理控制器Application Operator，但是暂时只支持Pod副本数的管理。</p>
 <p>我们要通过一个Application类型来定义一个自己的资源对象，然后在控制器中获取这个资源对象的详细配置，接着根据它的配置去创建相应数量的Pod，就像De-ployment那样工作。当然，为了避免Demo项目过于复杂，这里不去考虑过多的异常处理、程序健壮性、业务逻辑完备等。</p>
-<img src="../images/application_operator_function.png" style="zoom:50%;" />
-
-
-
+<p><img src="/../images/application_operator_function.png" alt="that&#39;s the way"></p>
 <h3 id="2-初始化项目"><a href="#2-初始化项目" class="headerlink" title="2. 初始化项目"></a>2. 初始化项目</h3><p>创建文件夹组，创建文件夹，在里面执行以下语句</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubebuilder init --domain=danielhu.cn --repo=github.com/daniel-hutao/application-operator --owner Daniel.Hu</span><br></pre></td></tr></table></figure>
 
@@ -430,10 +426,7 @@
 <h3 id="8-资源清理"><a href="#8-资源清理" class="headerlink" title="8. 资源清理"></a>8. 资源清理</h3><p>前面我们通过几个步骤分别部署了CRD、CR和Controller，这时环境中新增的资源不少（各种rbac相关的、部署相关的资源），如果这些资源都用kubectl一个一个来清理，还是很痛苦的。同样，清理的步骤也可以通过Makefile来实现：</p>
 <p>卸载Controller：<code>make undeploy</code></p>
 <p>卸载CRD：<code>make uninstall</code></p>
-<h3 id="9-总结与理解"><a href="#9-总结与理解" class="headerlink" title="9.总结与理解"></a>9.总结与理解</h3><img src="../images/summarize_helloworld.png" style="zoom:80%;" />
-
-
-
+<h3 id="9-总结与理解"><a href="#9-总结与理解" class="headerlink" title="9.总结与理解"></a>9.总结与理解</h3><p><img src="/../images/summarize_helloworld.png"></p>
 <h3 id="10-受锤感悟"><a href="#10-受锤感悟" class="headerlink" title="10. 受锤感悟"></a>10. 受锤感悟</h3><p>在做的过程中一次次的遇到各种问题，环境、网络、版本匹配、敲错命令找半天、k8s莫名升级到最新版本、教程有误……各种错误，无一不让我心头焦灼攥紧拳头火冒三丈，心灰意冷。</p>
 <p>不断遇到问题，不断解决问题，这个过程很痛苦，但是问题解决的那一刻很有成就感。</p>
 <p>相信只要不放弃，在被各种“问题”洗礼的过程中，我们的能力会越来越强。</p>
@@ -486,7 +479,9 @@
 	
 	
 	<br>
-	Nicolson的博客
+	Theme <a href="//github.com/wujun234/hexo-theme-tree" target="_blank">Tree</a>
+	by <a href="//github.com/wujun234" target="_blank">WuJun</a>
+	Powered by <a href="//hexo.io" target="_blank">Hexo</a>
 	</p>
 </div>
 
