@@ -328,7 +328,6 @@
 <p>找不到go</p>
 <p>export PATH=$PATH:/usr/local/go/bin</p>
 <p>上述方法的PATH 在终端关闭 后就会消失。所以还是建议通过编辑/etc/profile来改PATH，也可以修改家目录下的.bashrc(即：~/.bashrc)。</p>
-<blockquote>
 <p>修改环境变量</p>
 <ul>
 <li>
@@ -347,12 +346,10 @@
 </li>
 </ul>
 </blockquote>
-</blockquote>
 <p><strong>报错3：</strong></p>
 <blockquote>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">Error: failed to initialize project: unable to scaffold with <span class="token string">"base.go.kubebuilder.io/ve"</span><span class="token builtin class-name">:</span> <span class="token builtin class-name">exit</span> status l<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <p>Go的版本不匹配，我用的是1.17.6，改为1.10.4，看到别人用1.18.5改为1.18.5</p>
-<blockquote>
 <p>仍然报错，研究一下午 + 一晚上看了各种文档和issue仍然解决不了，心如死灰欲哭无泪，正准备明天把虚拟机从头到尾都换成和教程同样的版本时跟室友抱怨起这个问题。</p>
 <p>他很感兴趣，趴我电脑旁边看问题，我当时回宿舍用的是自己笔记本远程登陆实验室电脑，实验室电脑开虚拟机+vpn，一打开vpn整个画面卡成PPT，但是就在这样的极端恶劣的情况下，我们又换谷歌搜索看了几个文章，仍未解决。</p>
 <p>后来他说你把这个报错信息发给我我再看看，他收到后第一时间打开了ChatGPT😂GPT说可能是GOBIN环境没配好，我又检查了环境，说可能是网络问题，我寻思网络能有啥问题，我ping集群ping百度都没问题。。。。</p>
@@ -362,7 +359,6 @@
 <p>我试着打开VPN，重新敲入那句今天已经敲了100遍的命令<code>kubebuilder init XXXX</code>,它竟然开始显示在github上下载go的什么什么东西，一长串占满了屏幕。。。此时我已呆住。</p>
 <p>问题解决。</p>
 <p>(之前一直觉得chatGPT被吹得过头了，产生了很反感的情绪，觉得也就是外行人才把它视作神明，吹上了天。现在感觉这玩意还是能提供一些思路的)</p>
-</blockquote>
 </blockquote>
 <p><strong>项目文件结构分析</strong></p>
 <p>初始化完之后我的项目结构</p>
