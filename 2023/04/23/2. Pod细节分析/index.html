@@ -314,13 +314,13 @@
 <p><code>kubectl create/patch/apply -f nginx-pod.yaml</code></p>
 <p>一句简单的指令就可以了。</p>
 </blockquote>
-<h3 id="1-pod基础"><a class="markdownIt-Anchor" href="#1-pod基础"></a> 1 Pod基础</h3>
-<h4 id="11-pause容器"><a class="markdownIt-Anchor" href="#11-pause容器"></a> 1.1 Pause容器</h4>
+<h3 id="1-Pod基础">1 Pod基础</h3>
+<h4 id="1-1-Pause容器">1.1 Pause容器</h4>
 <p>上文我们说了Pod就像一个豆荚，里面运行着容器。这些容器里面有一个显得尤为特殊，它叫做Pause。</p>
-<p><img src="/images/pod_pause.png" alt="pod_pause" /></p>
+<p><img src="/images/pod_pause.png" alt="pod_pause"></p>
 <p>Pause容器又叫根容器，它随Pod的建立而建立，其他pod都会从pause容器中fork出来。它掌握了此Pod的网络栈和存储资源。同一Pod的容器可以共享Pause的网络栈和Volume存储（Volume是Pod中能够被多个容器访问的共享目录），因此他们之间通信和数据交换更为高效，在设计时我们可以充分利用这一特性将一组密切相关的服务进程放入同一个Pod中。同一个Pod里的容器之间仅需通过localhost就能互相通信。</p>
-<h4 id="12-pod的标签"><a class="markdownIt-Anchor" href="#12-pod的标签"></a> 1.2 Pod的标签</h4>
-<h3 id="2-pod的生命周期"><a class="markdownIt-Anchor" href="#2-pod的生命周期"></a> 2 Pod的生命周期</h3>
+<h4 id="1-2-Pod的标签">1.2 Pod的标签</h4>
+<h3 id="2-Pod的生命周期">2 Pod的生命周期</h3>
 <p>我们一般将pod对象从创建至终的这段时间范围称为pod的生命周期，它主要包含下面的过程：</p>
 <ul>
 <li>
@@ -345,8 +345,8 @@
 </li>
 </ul>
 <p>下面逐一介绍各个过程中涉及到的技术细节，各个组件的配合实现方法。</p>
-<h4 id="21-pod的创建"><a class="markdownIt-Anchor" href="#21-pod的创建"></a> 2.1 Pod的创建</h4>
-<p><img src="/images/Pod_create.png" alt="Pod_create" /></p>
+<h4 id="2-1-Pod的创建">2.1 Pod的创建</h4>
+<p><img src="/images/Pod_create.png" alt="Pod_create"></p>
 <ul>
 <li>
 <p>首先用户通过kubectl提交需要创建的pod信息给Api Server。</p>
@@ -355,11 +355,11 @@
 <p>Api Server开始生成pod对象的信息，并将信息存入etcd，然后立即返回确认信息至客户端。</p>
 </li>
 </ul>
-<p><img src="/images/pod_init.png" alt="pod_init" /></p>
+<p><img src="/images/pod_init.png" alt="pod_init"></p>
 <ul>
 <li>Api Server开始读取etcd中的Pod信息，反映其中pod对象的变化，其它组件使用watch机制来跟踪检查Api Server上的变动。</li>
 </ul>
-<p><img src="/images/pod_init2.png" alt="pod_init2" /></p>
+<p><img src="/images/pod_init2.png" alt="pod_init2"></p>
 <ul>
 <li>
 <p>scheduler发现有新的pod对象要创建，开始为Pod分配主机并将结果信息更新至Api Server。</p>
@@ -368,13 +368,13 @@
 <p>node节点上的kubelet发现有pod调度过来，开始工作。</p>
 </li>
 </ul>
-<p><img src="/images/pod_init3.png" alt="pod_init3" /></p>
+<p><img src="/images/pod_init3.png" alt="pod_init3"></p>
 <ul>
 <li>Kubelet尝试创建容器，并将创建结果回送至Api Server。</li>
 <li>Api Server将接收到的pod状态信息存入etcd中。</li>
 </ul>
 <p>通过以上过程就更加看出Api Server是Master中各组件工作的核心，各个组件都在监听Api Server中Pod的状态变化，当某Pod的当前状态需要自己做相应工作才能进一步推动时就会开始工作，并将做完后的结果同步到Api Server中。</p>
-<h4 id="22-pod的生存过程"><a class="markdownIt-Anchor" href="#22-pod的生存过程"></a> 2.2 Pod的生存过程</h4>
+<h4 id="2-2-Pod的生存过程">2.2 Pod的生存过程</h4>
 <p>在创建后的整个生命周期中，Pod会出现5种<strong>状态</strong>（<strong>相位</strong>），分别如下：</p>
 <ul>
 <li>挂起（Pending）：apiserver已经创建了pod资源对象，但它尚未被调度完成或者仍处于下载镜像的过程中</li>
@@ -383,7 +383,7 @@
 <li>失败（Failed）：所有容器都已经终止，但至少有一个容器终止失败，即容器返回了非0值的退出状态</li>
 <li>未知（Unknown）：apiserver无法正常获取到pod对象的状态信息，通常由网络通信失败所导致</li>
 </ul>
-<p><img src="/images/lifetime.png" alt="lifetime" /></p>
+<p><img src="/images/lifetime.png" alt="lifetime"></p>
 <p><strong>初始化容器</strong></p>
 <p>初始化容器是在pod的主容器启动之前要运行的容器，可以有一个或者多个。它主要是做一些主容器的前置工作，具有两大特征：</p>
 <ol>
@@ -412,8 +412,8 @@
 <li>Never ： 不论状态为何，都不重启该容器</li>
 </ul>
 <p>​    重启策略适用于pod对象中的所有容器，首次需要重启的容器，将在其需要时立即进行重启，随后再次需要重启的操作将由kubelet延迟一段时间后进行，且反复的重启操作的延迟时长以此为10s、20s、40s、80s、160s和300s，300s是最大延迟时长。</p>
-<h4 id="23-pod的终止过程"><a class="markdownIt-Anchor" href="#23-pod的终止过程"></a> 2.3 Pod的终止过程</h4>
-<p><img src="/images/pod_terminate.png" alt="pod_terminate" /></p>
+<h4 id="2-3-Pod的终止过程">2.3 Pod的终止过程</h4>
+<p><img src="/images/pod_terminate.png" alt="pod_terminate"></p>
 <p>这个过程同样是Master中各个组件合作完成的，此处不再做细节展示。</p>
 <ul>
 <li>
@@ -426,7 +426,7 @@
 <p>将pod标记为terminating状态。</p>
 </li>
 </ul>
-<p><img src="/images/pod_terminate3.png" alt="pod_terminate3" /></p>
+<p><img src="/images/pod_terminate3.png" alt="pod_terminate3"></p>
 <ul>
 <li>kubelet在监控到pod对象转为terminating状态的同时启动pod关闭过程。</li>
 <li>端点控制器监控到pod对象的关闭行为时将其从所有匹配到此端点的service资源的端点列表中移除。</li>
@@ -435,15 +435,15 @@
 <li>宽限期结束后，若pod中还存在仍在运行的进程，那么pod对象会收到立即终止的信号。</li>
 <li>kubelet请求Api Server将此pod资源的宽限期设置为0从而完成删除操作，此时pod对于用户已不可见。</li>
 </ul>
-<h3 id="3-pod的调度"><a class="markdownIt-Anchor" href="#3-pod的调度"></a> 3 Pod的调度</h3>
+<h3 id="3-Pod的调度">3 Pod的调度</h3>
 <p>我们知道Master中的组件Scheduler的功能就是把Pod分配到它认为最优的Node中，分配的策略是多样的，这样使得我们可以更加合理、充分的利用集群的资源。但是很多时候我们对于这种自动调度并不感到满足，比如我们想把功能相关的Pod放到同一个Node中，如此这些Pod的通信在本Node中即可以完成，这显然节省了大量的IO、网络资源。</p>
 <p>K8s提供了这样的功能，总结起来，在K8s中，调度总共可以分为四种：</p>
-<h4 id="31-自动调度"><a class="markdownIt-Anchor" href="#31-自动调度"></a> 3.1 自动调度</h4>
+<h4 id="3-1-自动调度">3.1 自动调度</h4>
 <p>运行在哪个节点上完全由Scheduler经过一系列的算法计算得出。</p>
-<h4 id="32-定向调度"><a class="markdownIt-Anchor" href="#32-定向调度"></a> 3.2 定向调度</h4>
+<h4 id="3-2-定向调度">3.2 定向调度</h4>
 <p>强制约束将Pod调度到指定的Name的Node节点上。这种方式，其实是直接跳过Scheduler的调度逻辑，直接将Pod调度到指定名称的节点。如果某节点不存在或出现故障，Pod也会向上面进行调度，然后显示调度失败。</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: pod-nodename</span><br><span class="line">  namespace: dev</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line"></span><br><span class="line">  - name: nginx</span><br><span class="line">    image: nginx:1.17.1</span><br><span class="line">      nodeName: node1 # 指定调度到node1节点上</span><br></pre></td></tr></table></figure>
-<h4 id="33-亲和性调度"><a class="markdownIt-Anchor" href="#33-亲和性调度"></a> 3.3 亲和性调度</h4>
+<h4 id="3-3-亲和性调度">3.3 亲和性调度</h4>
 <p>上面的强制调度无疑是不够好的，若因为操作人员失误，Pod就真的运行不起来放在那里，这合理吗？不合理。</p>
 <p>所以我们需要以温和的方式，建议K8s把某Pod调度到某节点。这就是亲和性调度。</p>
 <p>亲和性调度可以通过配置的形式，实现优先选择满足条件的Node进行调度，如果没有，也可以调度到不满足条件的节点上，使调度更加灵活。</p>
@@ -454,7 +454,7 @@
 <li>podAntiAffinity(pod反亲和性) :  以pod为目标，解决pod不能和哪些已存在pod部署在同一个拓扑域中的问题</li>
 </ul>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: pod-nodeaffinity-preferred</span><br><span class="line">  namespace: dev</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">  - name: nginx</span><br><span class="line">    image: nginx:1.17.1</span><br><span class="line">  affinity:  #亲和性设置</span><br><span class="line">    nodeAffinity: #设置node亲和性</span><br><span class="line">      preferredDuringSchedulingIgnoredDuringExecution: # 软限制</span><br><span class="line">      - weight: 1</span><br><span class="line">        preference:</span><br><span class="line">          matchExpressions: # 匹配env的值在[&quot;xxx&quot;,&quot;yyy&quot;]中的标签(当前环境没有)</span><br><span class="line">          - key: nodeenv</span><br><span class="line">            operator: In</span><br><span class="line">            values: [&quot;xxx&quot;,&quot;yyy&quot;]</span><br></pre></td></tr></table></figure>
-<h4 id="34-基于污点和容忍的调度"><a class="markdownIt-Anchor" href="#34-基于污点和容忍的调度"></a> 3.4 基于污点和容忍的调度</h4>
+<h4 id="3-4-基于污点和容忍的调度">3.4 基于污点和容忍的调度</h4>
 <p><strong>污点（Taints）</strong></p>
 <p>​    前面的调度方式都是站在Pod的角度上，通过在Pod上添加属性，来确定Pod是否要调度到指定的Node上，其实我们也可以站在Node的角度上，通过在Node上添加<strong>污点</strong>属性，来决定是否允许Pod调度过来。</p>
 <p>​    Node被设置上污点之后就和Pod之间存在了一种相斥的关系，进而拒绝Pod调度进来，甚至可以将已经存在的Pod驱逐出去。</p>
@@ -464,16 +464,16 @@
 <li>NoSchedule：kubernetes将不会把Pod调度到具有该污点的Node上，但不会影响当前Node上已存在的Pod</li>
 <li>NoExecute：kubernetes将不会把Pod调度到具有该污点的Node上，同时也会将Node上已存在的Pod驱离</li>
 </ul>
-<p><img src="/images/flaw.png" alt="flaw" /></p>
+<p><img src="/images/flaw.png" alt="flaw"></p>
 <p>使用kubectl设置和去除污点的命令示例如下：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 设置污点</span><br><span class="line">kubectl taint nodes node1 key=value:effect</span><br><span class="line"></span><br><span class="line"># 去除污点</span><br><span class="line">kubectl taint nodes node1 key:effect-</span><br><span class="line"></span><br><span class="line"># 去除所有污点</span><br><span class="line">kubectl taint nodes node1 key-</span><br></pre></td></tr></table></figure>
 <p><strong>容忍（Toleration）</strong></p>
 <p>上面介绍了污点的作用，我们可以在node上添加污点用于拒绝pod调度上来，但是如果就是想将一个pod调度到一个有污点的node上去，这时候应该怎么做呢？这就要使用到<strong>容忍</strong>。污点就是拒绝，容忍就是忽略，Node通过污点拒绝pod调度上去，Pod通过容忍忽略拒绝。</p>
-<p><img src="/images/ressitence.png" alt="ressitence" /></p>
+<p><img src="/images/ressitence.png" alt="ressitence"></p>
 <p>设置方式如下</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: pod-toleration</span><br><span class="line">  namespace: dev</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">  - name: nginx</span><br><span class="line">    image: nginx:1.17.1</span><br><span class="line">  tolerations:      # 添加容忍</span><br><span class="line">  - key: &quot;tag&quot;        # 要容忍的污点的key</span><br><span class="line">    operator: &quot;Equal&quot; # 操作符</span><br><span class="line">    value: &quot;heima&quot;    # 容忍的污点的value</span><br><span class="line">    effect: &quot;NoExecute&quot;   # 添加容忍的规则，这里必须和标记的污点规则相同</span><br></pre></td></tr></table></figure>
-<h3 id="4-总结从配置文件看pod"><a class="markdownIt-Anchor" href="#4-总结从配置文件看pod"></a> 4 总结：从配置文件看Pod</h3>
-<h4 id="42-pod配置清单"><a class="markdownIt-Anchor" href="#42-pod配置清单"></a> 4.2 Pod配置清单</h4>
+<h3 id="4-总结：从配置文件看Pod">4 总结：从配置文件看Pod</h3>
+<h4 id="4-2-Pod配置清单">4.2 Pod配置清单</h4>
 <p>在kubernetes中基本所有资源的一级属性都是一样的，主要包含5部分：</p>
 <ul>
 <li>

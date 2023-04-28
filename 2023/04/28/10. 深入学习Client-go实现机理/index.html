@@ -305,7 +305,7 @@
 <!-- content -->
 <div id="article-content">
 	<p>使用Kubebuilder已经屏蔽了不少client-go的细节，但是要深入Operator开发机制，还是需要对client-go有一定的理解。在GitHub（<a href="https://github.com/kubernetes/client-go%EF%BC%89%E4%B8%8A%E5%8F%AF%E4%BB%A5%E6%89%BE%E5%88%B0client-go%E7%9A%84%E6%BA%90%E7%A0%81">https://github.com/kubernetes/client-go）上可以找到client-go的源码</a></p>
-<h3 id="1-client-go的包结构"><a class="markdownIt-Anchor" href="#1-client-go的包结构"></a> 1. client-go的包结构</h3>
+<h3 id="1-client-go的包结构">1. client-go的包结构</h3>
 <ul>
 <li>kubernetes：这个包中放的是用client-gen自动生成的用来访问Kubernetes API的ClientSet，后面会经常看到ClientSet这个工具。</li>
 <li>discovery：这个包提供了一种机制用来发现API Server支持的API资源。</li>
@@ -316,15 +316,15 @@
 </ul>
 <p><strong>client-go和Kubernetes的版本对应关系</strong></p>
 <p>Kubernetes版本大于或等于1.17.0时，cllient-go版本使用对应的v0.x.y；Kubernetes版本小于1.17.0时，client-go版本使用kubernetes-1.x.y。其中，x和y与Kubernetes版本号后两位保持一致，比如Kubernetes v1.17.0对应client-go v0.17.0。</p>
-<p><img src="/images/client-go-kubernetes-cooperate.png" alt="client-go-kubernetes-cooperate" /></p>
-<p><img src="/images/go-kube-coo.png" alt="go-kube-coo" /></p>
-<h3 id="2-源码概览"><a class="markdownIt-Anchor" href="#2-源码概览"></a> 2. 源码概览</h3>
-<h3 id="3-workqueue源码剖析"><a class="markdownIt-Anchor" href="#3-workqueue源码剖析"></a> 3. WorkQueue源码剖析</h3>
-<h3 id="4-deltafifi"><a class="markdownIt-Anchor" href="#4-deltafifi"></a> 4. DeltaFIFI</h3>
-<h3 id="5-indexer和threadsafestore"><a class="markdownIt-Anchor" href="#5-indexer和threadsafestore"></a> 5. Indexer和ThreadSafeStore</h3>
-<h3 id="listwatcher"><a class="markdownIt-Anchor" href="#listwatcher"></a> ListWatcher</h3>
-<h3 id="reflector"><a class="markdownIt-Anchor" href="#reflector"></a> Reflector</h3>
-<h3 id="informer"><a class="markdownIt-Anchor" href="#informer"></a> Informer</h3>
+<p><img src="/images/client-go-kubernetes-cooperate.png" alt="client-go-kubernetes-cooperate"></p>
+<p><img src="/images/go-kube-coo.png" alt="go-kube-coo"></p>
+<h3 id="2-源码概览">2. 源码概览</h3>
+<h3 id="3-WorkQueue源码剖析">3. WorkQueue源码剖析</h3>
+<h3 id="4-DeltaFIFI">4. DeltaFIFI</h3>
+<h3 id="5-Indexer和ThreadSafeStore">5. Indexer和ThreadSafeStore</h3>
+<h3 id="ListWatcher">ListWatcher</h3>
+<h3 id="Reflector">Reflector</h3>
+<h3 id="Informer">Informer</h3>
 <blockquote>
 <p>Notes：</p>
 <p>以上内容均为个人学习过程中的理解，理解和总结可能有偏差。文章内容会随着学习过程不断修改完善。</p>

@@ -304,7 +304,7 @@
 
 <!-- content -->
 <div id="article-content">
-	<h3 id="k8s组件版本自动升级了"><a class="markdownIt-Anchor" href="#k8s组件版本自动升级了"></a> K8s组件版本自动升级了？</h3>
+	<h3 id="K8s组件版本自动升级了？">K8s组件版本自动升级了？</h3>
 <p>报错</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">The connection to the server 192.168.62.128:6443 was refused - did you specify the right host or port?</span><br><span class="line">make: *** [install] 错误 1</span><br><span class="line"></span><br><span class="line">K8s集群不管用了！</span><br></pre></td></tr></table></figure>
 <p>首先考虑是通信的问题，想起来自己最开始配置的域名解析只考虑了静态ip的状况，自己现在已经是动态ip了。</p>
@@ -319,7 +319,7 @@
 <p>kubelet（1.17.4）</p>
 <p>kubectl（1.17.4）</p>
 <p>降级</p>
-<p><code>yum downgrade kubeadm-1.17.4 kubelet-1.17.4 kubectl-1.17.4</code></p>
+<p><code>yum downgrade kubeadm-1.17.4  kubelet-1.17.4  kubectl-1.17.4</code></p>
 <p>降级后再次查询</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">root@master ~]# rpm -qa|grep kube</span><br><span class="line">kubeadm-1.17.4-0.x86_64</span><br><span class="line">kubelet-1.17.4-0.x86_64</span><br><span class="line">kubernetes-cni-1.2.0-0.x86_64</span><br><span class="line">kubectl-1.17.4-0.x86_64</span><br></pre></td></tr></table></figure>
 <p>集群恢复正常。</p>

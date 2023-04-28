@@ -306,7 +306,7 @@ Notes：
 				</h2>
 				<div class="index-brief">
 					使用Kubebuilder已经屏蔽了不少client-go的细节，但是要深入Operator开发机制，还是需要对client-go有一定的理解。在GitHub（https://github.com/kubernetes/client-go）上可以找到client-go的源码
- 1. client-g
+1. client-go
 					...
 				</div>
 			</a>
@@ -332,13 +332,13 @@ Notes：
 					GVK和GVR
 				</h2>
 				<div class="index-brief">
-					 GVK和GVR
+					GVK和GVR
 GVK就是Group、Version、Kind三个词的首字母缩写。
 我们在描述Kubernetes API时经常会用到这样一个四元组：Groups、Versions、Kinds和Resources。它们具体是什么含义呢？
 
 Groups和Versions：
 
-一个Kubernete
+一个Kubernetes
 					...
 				</div>
 			</a>
@@ -450,9 +450,9 @@ Kubernetes中的资源本质就是一个API对象，这个对象的“期望状�
 					【故障】K8s组件版本出问题
 				</h2>
 				<div class="index-brief">
-					 K8s组件版本自动升级了？
+					K8s组件版本自动升级了？
 报错
-1234The connection to the server 192.168.62.128:6443 was refused - did you specify the right host or port?make: *** [install] 错误 1K8
+1234The connection to the server 192.168.62.128:6443 was refused - did you specify the right host or port?make: *** [install] 错误 1K8s
 					...
 				</div>
 			</a>
@@ -478,10 +478,10 @@ Kubernetes中的资源本质就是一个API对象，这个对象的“期望状�
 					尝试开发一个简单的Pod管理控制器
 				</h2>
 				<div class="index-brief">
-					 开发一个Pod管理控制器
- 1. 开发目标
+					开发一个Pod管理控制器
+1. 开发目标
 类比于Deployment可以管理Pod，我们现在尝试开发一个简单的Pod管理控制器Application Operator，但是暂时只支持Pod副本数的管理。
-我们要通过一个Application类型来定义一个自己的资源对象，然后在控制器中获取这个资源
+我们要通过一个Application类型来定义一个自己的资源对象，然后在控制器中获取这个资源对象
 					...
 				</div>
 			</a>
@@ -507,8 +507,8 @@ Kubernetes中的资源本质就是一个API对象，这个对象的“期望状�
 					什么是Operator
 				</h2>
 				<div class="index-brief">
-					 1. 为什么需要Operator
-随着K8s的广泛应用，传统的K8s资源、组件等已经无法满足自定义的需求。K8s提供了接口允许用户自己定义K8s中的资源和控制器来增强K8s的功能，让集群更加的智能化，让运维人员可以更省心。所以Operator模式的本质就是”让K8s学会自己运维自己“，他把一个领域
+					1. 为什么需要Operator
+随着K8s的广泛应用，传统的K8s资源、组件等已经无法满足自定义的需求。K8s提供了接口允许用户自己定义K8s中的资源和控制器来增强K8s的功能，让集群更加的智能化，让运维人员可以更省心。所以Operator模式的本质就是”让K8s学会自己运维自己“，他把一个领域运
 					...
 				</div>
 			</a>
@@ -538,11 +538,11 @@ Kubernetes中的资源本质就是一个API对象，这个对象的“期望状�
 q:把容器称为轻量级虚拟机真的合适吗？
 我们在很多地方都看到人们把Docker为主的容器称为是一个轻量级虚拟机，因为它像虚拟机一样实现了应用程序之间的隔离。
 
- 容器实现机理
+容器实现机理
 linux的namespace和另一个资源限制组件
- 哪些隔离了，哪些没隔离？
+哪些隔离了，哪些没隔离？
 很多东西其实没做好隔离
- 我们在基于容器的
+我们在基于容器的开发中
 					...
 				</div>
 			</a>

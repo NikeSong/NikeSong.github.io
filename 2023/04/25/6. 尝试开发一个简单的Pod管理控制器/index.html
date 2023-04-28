@@ -304,12 +304,12 @@
 
 <!-- content -->
 <div id="article-content">
-	<h2 id="开发一个pod管理控制器"><a class="markdownIt-Anchor" href="#开发一个pod管理控制器"></a> 开发一个Pod管理控制器</h2>
-<h3 id="1-开发目标"><a class="markdownIt-Anchor" href="#1-开发目标"></a> 1. 开发目标</h3>
+	<h2 id="开发一个Pod管理控制器">开发一个Pod管理控制器</h2>
+<h3 id="1-开发目标">1. 开发目标</h3>
 <p>类比于Deployment可以管理Pod，我们现在尝试开发一个简单的Pod管理控制器Application Operator，但是暂时只支持Pod副本数的管理。</p>
 <p>我们要通过一个Application类型来定义一个自己的资源对象，然后在控制器中获取这个资源对象的详细配置，接着根据它的配置去创建相应数量的Pod，就像De-ployment那样工作。当然，为了避免Demo项目过于复杂，这里不去考虑过多的异常处理、程序健壮性、业务逻辑完备等。</p>
-<p><img src="/images/application_operator_function.png" alt="that's the way" /></p>
-<h3 id="2-初始化项目"><a class="markdownIt-Anchor" href="#2-初始化项目"></a> 2. 初始化项目</h3>
+<p><img src="/images/application_operator_function.png" alt="that's the way"></p>
+<h3 id="2-初始化项目">2. 初始化项目</h3>
 <p>创建文件夹组，创建文件夹，在里面执行以下语句</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubebuilder init --domain=danielhu.cn --repo=github.com/daniel-hutao/application-operator --owner Daniel.Hu</span><br></pre></td></tr></table></figure>
 <p>参数含义</p>
@@ -332,7 +332,7 @@
 <p>修改环境变量</p>
 <ul>
 <li>
-<pre class="highlight"><code class="">vi /etc/profile
+<pre><code>vi /etc/profile
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">- 最下面加上：</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 export PATH=$PATH:/usr/local/xxx/bin
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">- 刷新环境变量</span><br><span class="line"></span><br></pre></td></tr></table></figure>
@@ -347,72 +347,74 @@ source /etc/profile
 </blockquote>
 <p>kubebuilder create api --group apps --version v1 --kind Application</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
-<p>[root@master application-operator]# kubebuilder create api --group apps --version v1 --kind Application<br />
-Create Resource [y/n]<br />
-y<br />
-Create Controller [y/n]<br />
-y<br />
-Writing kustomize manifests for you to edit…<br />
-Writing scaffold for you to edit…<br />
-api/v1/application_types.go<br />
-controllers/application_controller.go<br />
-Update dependencies:<br />
-$ go mod tidy<br />
-go: downloading <a href="http://github.com/onsi/ginkgo/v2">github.com/onsi/ginkgo/v2</a> v2.0.0<br />
-Running make:<br />
-$ make generate<br />
+<p>[root@master application-operator]# kubebuilder create api --group apps --version v1 --kind Application<br>
+Create Resource [y/n]<br>
+y<br>
+Create Controller [y/n]<br>
+y<br>
+Writing kustomize manifests for you to edit…<br>
+Writing scaffold for you to edit…<br>
+api/v1/application_types.go<br>
+controllers/application_controller.go<br>
+Update dependencies:<br>
+$ go mod tidy<br>
+go: downloading <a href="http://github.com/onsi/ginkgo/v2">github.com/onsi/ginkgo/v2</a> v2.0.0<br>
+Running make:<br>
+$ make generate<br>
 …</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">新增了很多文件夹和文件，尤其是api文件夹比较重要；部分文件有改动，此时可以通过git status观察到。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">### 4. CRD实现和部署</span><br><span class="line"></span><br><span class="line">我们前面提到过CRD的代码主要定义在**api/v1/application_types.go**文件中，先打开看一下现有代码是怎样的。主要看Spec结构，也就是ApplicationSpec这个结构体的定义：</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>type ApplicationSpec struct {<br />
-Foo string <code>json:&quot;foo,omitempty&quot;</code><br />
+<p>type ApplicationSpec struct {<br>
+Foo string <code>json:&quot;foo,omitempty&quot;</code><br>
 }</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">增加内容如下</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>import (<br />
-corev1 “<a target="_blank" rel="noopener" href="http://k8s.io/api/core/v1">k8s.io/api/core/v1</a>”<br />
-metav1 “<a target="_blank" rel="noopener" href="http://k8s.io/apimachinery/pkg/apis/meta/v1">k8s.io/apimachinery/pkg/apis/meta/v1</a>”<br />
+<p>import (<br>
+corev1 “<a target="_blank" rel="noopener" href="http://k8s.io/api/core/v1">k8s.io/api/core/v1</a>”<br>
+metav1 “<a target="_blank" rel="noopener" href="http://k8s.io/apimachinery/pkg/apis/meta/v1">k8s.io/apimachinery/pkg/apis/meta/v1</a>”<br>
 )</p>
-<p>// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!<br />
+<p>// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!<br>
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.</p>
-<p>// ApplicationSpec defines the desired state of Application<br />
-type ApplicationSpec struct {<br />
-Replicas int32                  <code>json:&quot;replicas,omitempty&quot;</code><br />
-Template corev1.PodTemplateSpec <code>json:&quot;template,omitempty&quot;</code><br />
+<p>// ApplicationSpec defines the desired state of Application<br>
+type ApplicationSpec struct {<br>
+Replicas int32                  <code>json:&quot;replicas,omitempty&quot;</code><br>
+Template corev1.PodTemplateSpec <code>json:&quot;template,omitempty&quot;</code><br>
 }</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line">然后保存调用命令` make manifests`，显示如下</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>/root/MyOPeratorProjects/application-operator/bin/controller-gen rbac:roleName=manager-role crd webhook paths=&quot;./…&quot; output:crd:artifacts:config=config/crd/bases</p>
-<h2 id="-code10-"><a class="markdownIt-Anchor" href="#-code10-"></a> <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">看一下这两个文件/目录：</span><br><span class="line"></span><br><span class="line">1. **·config/crd/bases/：**这个目录中新增了一个**apps.danielhu.cn_applications.yaml**文件，也就是Application类型的CRD配置：</span><br><span class="line"></span><br></pre></td></tr></table></figure></h2>
-<p>apiVersion: <a target="_blank" rel="noopener" href="http://apiextensions.k8s.io/v1">apiextensions.k8s.io/v1</a><br />
-kind: CustomResourceDefinition<br />
-metadata:<br />
-annotations:<br />
-<a target="_blank" rel="noopener" href="http://controller-gen.kubebuilder.io/version:">controller-gen.kubebuilder.io/version:</a> v0.9.2<br />
-creationTimestamp: null<br />
-name: <a target="_blank" rel="noopener" href="http://applications.apps.danielhu.cn">applications.apps.danielhu.cn</a><br />
-spec:<br />
-group: <a target="_blank" rel="noopener" href="http://apps.danielhu.cn">apps.danielhu.cn</a><br />
-names:<br />
-kind: Application<br />
-listKind: ApplicationList<br />
-plural: applications<br />
-singular: application<br />
-scope: Namespaced<br />
+<p>/root/MyOPeratorProjects/application-operator/bin/controller-gen rbac:roleName=manager-role crd webhook paths=“./…” output:crd:artifacts:config=config/crd/bases</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">看一下这两个文件/目录：</span><br><span class="line"></span><br><span class="line">1. **·config/crd/bases/：**这个目录中新增了一个**apps.danielhu.cn_applications.yaml**文件，也就是Application类型的CRD配置：</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<hr>
+<p>apiVersion: <a target="_blank" rel="noopener" href="http://apiextensions.k8s.io/v1">apiextensions.k8s.io/v1</a><br>
+kind: CustomResourceDefinition<br>
+metadata:<br>
+annotations:<br>
+<a target="_blank" rel="noopener" href="http://controller-gen.kubebuilder.io/version:">controller-gen.kubebuilder.io/version:</a> v0.9.2<br>
+creationTimestamp: null<br>
+name: <a target="_blank" rel="noopener" href="http://applications.apps.danielhu.cn">applications.apps.danielhu.cn</a><br>
+spec:<br>
+group: <a target="_blank" rel="noopener" href="http://apps.danielhu.cn">apps.danielhu.cn</a><br>
+names:<br>
+kind: Application<br>
+listKind: ApplicationList<br>
+plural: applications<br>
+singular: application<br>
+scope: Namespaced<br>
 versions:</p>
 <ul>
 <li>name: v1</li>
 </ul>
-<h2 id="-code11-"><a class="markdownIt-Anchor" href="#-code11-"></a> <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">2. **·config/rbac/role.yaml**：这里面定义的是一个ClusterRole，从名字manager-role上大致可以猜到，这是后面Controller部署后将充当的“角色”。该文件定义了对applications资源的创建、删除、查询、更新等操作。</span><br><span class="line"></span><br></pre></td></tr></table></figure></h2>
-<p>apiVersion: <a target="_blank" rel="noopener" href="http://rbac.authorization.k8s.io/v1">rbac.authorization.k8s.io/v1</a><br />
-kind: ClusterRole<br />
-metadata:<br />
-creationTimestamp: null<br />
-name: manager-role<br />
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">2. **·config/rbac/role.yaml**：这里面定义的是一个ClusterRole，从名字manager-role上大致可以猜到，这是后面Controller部署后将充当的“角色”。该文件定义了对applications资源的创建、删除、查询、更新等操作。</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<hr>
+<p>apiVersion: <a target="_blank" rel="noopener" href="http://rbac.authorization.k8s.io/v1">rbac.authorization.k8s.io/v1</a><br>
+kind: ClusterRole<br>
+metadata:<br>
+creationTimestamp: null<br>
+name: manager-role<br>
 rules:</p>
 <ul>
 <li>apiGroups:
 <ul>
-<li><a target="_blank" rel="noopener" href="http://apps.danielhu.cn">apps.danielhu.cn</a><br />
+<li><a target="_blank" rel="noopener" href="http://apps.danielhu.cn">apps.danielhu.cn</a><br>
 resources:</li>
-<li>applications<br />
+<li>applications<br>
 verbs:</li>
 <li>create</li>
 <li>delete</li>
@@ -425,18 +427,18 @@ verbs:</li>
 </li>
 <li>apiGroups:
 <ul>
-<li><a target="_blank" rel="noopener" href="http://apps.danielhu.cn">apps.danielhu.cn</a><br />
+<li><a target="_blank" rel="noopener" href="http://apps.danielhu.cn">apps.danielhu.cn</a><br>
 resources:</li>
-<li>applications/finalizers<br />
+<li>applications/finalizers<br>
 verbs:</li>
 <li>update</li>
 </ul>
 </li>
 <li>apiGroups:
 <ul>
-<li><a target="_blank" rel="noopener" href="http://apps.danielhu.cn">apps.danielhu.cn</a><br />
+<li><a target="_blank" rel="noopener" href="http://apps.danielhu.cn">apps.danielhu.cn</a><br>
 resources:</li>
-<li>applications/status<br />
+<li>applications/status<br>
 verbs:</li>
 <li>get</li>
 <li>patch</li>
@@ -445,42 +447,42 @@ verbs:</li>
 </li>
 </ul>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">通过`make install`命令来完成CRD的部署过程：</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">**报错**</span><br><span class="line"></span><br><span class="line">&gt; The connection to the server 192.168.62.128:6443 was refused - did you specify the right host or port?</span><br><span class="line">&gt;make: *** [install] 错误 1</span><br><span class="line">&gt; </span><br><span class="line">&gt; 此时突然发现K8s集群不管用了（个人特异性原因）！解决问题的过程见”集群出问题“文章。</span><br><span class="line">&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">成功后输出以下内容</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>[root@master application-operator]# make install<br />
-test -s /root/MyOPeratorProjects/application-operator/bin/controller-gen || GOBIN=/root/MyOPeratorProjects/application-operator/bin go install <a target="_blank" rel="noopener" href="http://sigs.k8s.io/controller-tools/cmd/controller-gen@v0.9.2">sigs.k8s.io/controller-tools/cmd/controller-gen@v0.9.2</a><br />
-/root/MyOPeratorProjects/application-operator/bin/controller-gen rbac:roleName=manager-role crd webhook paths=&quot;./…&quot; output:crd:artifacts:config=config/crd/bases<br />
-/root/MyOPeratorProjects/application-operator/bin/kustomize build config/crd | kubectl apply -f -<br />
+<p>[root@master application-operator]# make install<br>
+test -s /root/MyOPeratorProjects/application-operator/bin/controller-gen || GOBIN=/root/MyOPeratorProjects/application-operator/bin go install <a target="_blank" rel="noopener" href="http://sigs.k8s.io/controller-tools/cmd/controller-gen@v0.9.2">sigs.k8s.io/controller-tools/cmd/controller-gen@v0.9.2</a><br>
+/root/MyOPeratorProjects/application-operator/bin/controller-gen rbac:roleName=manager-role crd webhook paths=“./…” output:crd:artifacts:config=config/crd/bases<br>
+/root/MyOPeratorProjects/application-operator/bin/kustomize build config/crd | kubectl apply -f -<br>
 <a target="_blank" rel="noopener" href="http://customresourcedefinition.apiextensions.k8s.io/applications.apps.danielhu.cn">customresourcedefinition.apiextensions.k8s.io/applications.apps.danielhu.cn</a> created</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">执行完make install后，CRD就部署到集群中了，这时可以通过kubectl查询刚才创建的CRD。</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>[root@master application-operator]# kubectl get crd<br />
-NAME                            CREATED AT<br />
+<p>[root@master application-operator]# kubectl get crd<br>
+NAME                            CREATED AT<br>
 <a target="_blank" rel="noopener" href="http://applications.apps.danielhu.cn">applications.apps.danielhu.cn</a>   2023-04-26T06:31:35Z</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">可以看到，applications.apps.danielhu.cn这个CRD已经存在了。这时就像查询Deployment时可以用kubectl get deployment一样，可以通过kubectl get application来查询刚才自定义的资源。这里的报错信息是没找到资源，而不是“error:the server doesn&#x27;t have a resource type&quot;application&quot;”。换言之，此时kube-apiserver已经能识别这种资源了。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">**回顾一下，我们依次做的事情：**</span><br><span class="line"></span><br><span class="line">- kubebuilder create api --group xxx --version v1 --king Application</span><br><span class="line">  - 这时候在提示下创建了资源和controller</span><br><span class="line">  - 创建了api文件夹以及变更了main.go等</span><br><span class="line">- api/v1/application_types.go文件中import里加了corev1，metav1，ApplicationSpect中加了replica和template声明副本的数量和模板的配置</span><br><span class="line">- make manifests命令生成CR（config/rbac/role.yaml，Controller部署后将充当的“角色”。）和CRD配置（config/crd/bases/apps.danielhu.cn_applications.yaml）。</span><br><span class="line">- 通过make install命令来完成CRD的部署过程。</span><br><span class="line">  - 可以get到crd了，这里crd就像是development</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">### 5. CR部署</span><br><span class="line"></span><br><span class="line">和写一个Deployment资源配置对应的×××.yaml一样，创建Application同样需要一个YAML文件。我们在前面提到过在config/samples下有一个apps_v1_application.yaml，其中已经有一些默认配置项了，我们稍微修改一下，加上自定义的属性：</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>apiVersion: <a target="_blank" rel="noopener" href="http://apps.danielhu.cn/v1">apps.danielhu.cn/v1</a><br />
-kind: Application<br />
-metadata:<br />
-name: application-sample<br />
-namespace: default<br />
-labels:<br />
-app: nginx<br />
-spec:<br />
-replicas: 3<br />
-template:<br />
-spec:<br />
-containers:<br />
-- name: nginx<br />
-image: nginx:1.14.2<br />
-ports:<br />
+<p>apiVersion: <a target="_blank" rel="noopener" href="http://apps.danielhu.cn/v1">apps.danielhu.cn/v1</a><br>
+kind: Application<br>
+metadata:<br>
+name: application-sample<br>
+namespace: default<br>
+labels:<br>
+app: nginx<br>
+spec:<br>
+replicas: 3<br>
+template:<br>
+spec:<br>
+containers:<br>
+- name: nginx<br>
+image: nginx:1.14.2<br>
+ports:<br>
 - containerPort: 80</p>
-<h1 id="todouser-add-fields-here"><a class="markdownIt-Anchor" href="#todouser-add-fields-here"></a> TODO(user): Add fields here</h1>
+<h1>TODO(user): Add fields here</h1>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">apply一下</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>[root@master application-operator]# kubectl apply -f config/samples/apps_v1<br />
+<p>[root@master application-operator]# kubectl apply -f config/samples/apps_v1<br>
 <a target="_blank" rel="noopener" href="http://application.apps.danielhu.cn/application-sample">application.apps.danielhu.cn/application-sample</a> cr</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">查看刚才创建的application</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>[root@master application-operator]# kubectl get application<br />
-NAME                 AGE<br />
+<p>[root@master application-operator]# kubectl get application<br>
+NAME                 AGE<br>
 application-sample   99s</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">一个Application类型的application-sample实例创建出来了，其中包含自定义的所有字段。但是这时并不会有Pod被自动创建出来，因为还没有实现相应的控制器逻辑。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">### 6. Controller实现</span><br><span class="line"></span><br><span class="line">现在已经有了CR，该实现Controller逻辑去创建Pod了。在controllers/application_controller.go中的Reconcile()方法内添加如下代码：</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>func (r *ApplicationReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {<br />
+<p>func (r *ApplicationReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {<br>
 l := log.FromContext(ctx)</p>
 <pre><code>// get the Application
 app := &amp;dappsv1.Application&#123;&#125;
@@ -516,9 +518,9 @@ return ctrl.Result&#123;&#125;, nil
 </code></pre>
 <p>}</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">import部分</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>import (<br />
-“context”<br />
-“fmt”<br />
+<p>import (<br>
+“context”<br>
+“fmt”<br>
 “time”</p>
 <pre><code>corev1 &quot;k8s.io/api/core/v1&quot;
 &quot;k8s.io/apimachinery/pkg/api/errors&quot;
@@ -533,48 +535,48 @@ dappsv1 &quot;github.com/daniel-hutao/application-operator/api/v1&quot;
 <p>)</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">这里我们把自己的api/v1打包并使用别名dappsv1，避免和k8s.io/api/apps/v1包产生混淆。</span><br><span class="line"></span><br><span class="line">代码解释：</span><br><span class="line"></span><br><span class="line">![go_explain](/images/go_explain.png)</span><br><span class="line"></span><br><span class="line">启动controller：执行make run</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">**报错**</span><br><span class="line"></span><br><span class="line">&gt; 此时不出意外的又出问题了，输出一段数据后页面停止不动了，这时候ctrl+c退出，显示</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
 <blockquote>
-<p>1.682495037273707e+09   INFO    All workers finished    {“controller”: “application”, “controllerGroup”: “<a target="_blank" rel="noopener" href="http://apps.danielhu.cn">apps.danielhu.cn</a>”, “controllerKind”: “Application”}<br />
-1.6824950372737312e+09  INFO    Stopping and waiting for caches<br />
-1.6824950372738228e+09  INFO    Stopping and waiting for webhooks<br />
-1.6824950372738297e+09  INFO    Wait completed, proceeding to shutdown the manager<br />
+<p>1.682495037273707e+09   INFO    All workers finished    {“controller”: “application”, “controllerGroup”: “<a target="_blank" rel="noopener" href="http://apps.danielhu.cn">apps.danielhu.cn</a>”, “controllerKind”: “Application”}<br>
+1.6824950372737312e+09  INFO    Stopping and waiting for caches<br>
+1.6824950372738228e+09  INFO    Stopping and waiting for webhooks<br>
+1.6824950372738297e+09  INFO    Wait completed, proceeding to shutdown the manager<br>
 make: *** [run] 错误 1</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">不知道为啥，查看pod信息，发现三个pod都在pending</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>root@master application-operator]# kubectl get pod<br />
-NAME                   READY   STATUS    RESTARTS   AGE<br />
-application-sample-0   0/1     Pending   0          7m44s<br />
-application-sample-1   0/1     Pending   0          7m44s<br />
+<p>root@master application-operator]# kubectl get pod<br>
+NAME                   READY   STATUS    RESTARTS   AGE<br>
+application-sample-0   0/1     Pending   0          7m44s<br>
+application-sample-1   0/1     Pending   0          7m44s<br>
 application-sample-2   0/1     Pending   0          7m44s</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">这时候肯定是describe pod，输出最后的信息如下</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>Events:<br />
+<p>Events:<br>
 Type     Reason            Age                  From               Message</p>
-<hr />
+<hr>
 <p>Warning  FailedScheduling  65s (x6 over 8m33s)  default-scheduler  0/3 nodes are available: 3 node(s) had taints that the pod didn’t tolerate.</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">说三个节点都有污点，master肯定是有污点的，另外两个怎么回事？查看node，发现</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>[root@master application-operator]# kubectl get nodes<br />
-NAME     STATUS     ROLES    AGE     VERSION<br />
-master   Ready      master   5d16h   v1.17.4<br />
-node1    NotReady   <none>   5d15h   v1.17.4<br />
+<p>[root@master application-operator]# kubectl get nodes<br>
+NAME     STATUS     ROLES    AGE     VERSION<br>
+master   Ready      master   5d16h   v1.17.4<br>
+node1    NotReady   <none>   5d15h   v1.17.4<br>
 node2    NotReady   <none>   5d15h   v1.17.4</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">两个节点竟然没跑起来？describe node1发现提示NetworkUnavailable</span><br><span class="line"></span><br><span class="line">ping Node1发现不可达</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>[root@master application-operator]# ping node1<br />
-PING node1 (192.168.62.134) 56(84) bytes of data.<br />
+<p>[root@master application-operator]# ping node1<br>
+PING node1 (192.168.62.134) 56(84) bytes of data.<br>
 From master (192.168.62.128) icmp_seq=10 Destination Host Unreachable</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">不知道为啥网断了node1失去了ip地址，我进入node1重启网路服务，网络好了。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">**报错：**</span><br><span class="line"></span><br><span class="line">1.6824959595997632e+09  ERROR   setup   unable to start manager &#123;&quot;error&quot;: &quot;error listening on :8080: listen tcp :8080: bind: address already in use&quot;&#125;</span><br><span class="line"></span><br><span class="line">因为这个端口已经被我创建出来的pod占了，不用再创建新的了。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">此时kubectl get pods可以查出三个之前部署的pod已经在运行了。</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 </blockquote>
-<p>[root@master ~]# kubectl get pods<br />
-NAME                   READY   STATUS    RESTARTS   AGE<br />
-application-sample-0   1/1     Running   0          22h<br />
-application-sample-1   1/1     Running   0          22h<br />
+<p>[root@master ~]# kubectl get pods<br>
+NAME                   READY   STATUS    RESTARTS   AGE<br>
+application-sample-0   1/1     Running   0          22h<br>
+application-sample-1   1/1     Running   0          22h<br>
 application-sample-2   1/1     Running   0          22h</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">### 7. Controller部署</span><br><span class="line"></span><br><span class="line">前面我们部署了一个Application类型的资源对象实例，也运行Controller看到了相应副本数的Pod被创建出来。现在我们进一步模拟Operator实际使用时的部署方式，把Controller打包后用容器化方式部署到Kubernetes集群环境中：</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>make docker-build IMG=application-operator:v0.0.1<br />
-kind load docker-image application-operator:v0.0.1 --name dev    no<br />
+<p>make docker-build IMG=application-operator:v0.0.1<br>
+kind load docker-image application-operator:v0.0.1 --name dev    no<br>
 make deploy IMG=application-operator:v0.0.1</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">因为我的K8s不是使用kind，所以省掉了第二步，最终查到了部署的Pod</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>[root@master application-operator]# kubectl get pod -n application-operator-system<br />
-NAME                                                       READY   STATUS         RESTARTS   AGE<br />
+<p>[root@master application-operator]# kubectl get pod -n application-operator-system<br>
+NAME                                                       READY   STATUS         RESTARTS   AGE<br>
 application-operator-controller-manager-5b754fc8bd-z28z9   1/2     ErrImagePull   0          2m46s</p>
-<pre class="highlight"><code class="">
+<pre><code>
 至此，就实现了一个非常简单的Operator程序的开发、编译构建、打包、部署等流程。当然，如果前面执行make run启动了控制器创建出来的3个Pod没有被删除，这时再次部署一个Operator控制器，日志里肯定会有报错信息的，因为我们没有实现Pod存在校验等代码逻辑。不过这不是重点，有没有这些错误，我们的Demo程序都算走完了。到这里，大家基本体验了一遍Operator的快速开发流程。
 
 
