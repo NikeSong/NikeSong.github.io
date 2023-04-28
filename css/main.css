@@ -414,6 +414,6 @@ table td {
 img {
   display: block; /* 将图像设置为块级元素 */
   margin: 0 auto; /* 将图像水平居中 */
-  max-width: 250; /* 将图像最大宽度设置为500像素 */
+  /*max-width: 20; *//* 将图像最大宽度设置为500像素 */
   height: auto; /* 保持图像高度自适应 */
 }
