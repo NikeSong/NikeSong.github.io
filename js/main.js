@@ -334,7 +334,7 @@ function scrollOff() {
 /**
  * Wrap images with fancybox support.
  */
-function wrapImageWithFancyBox() {
+/*function wrapImageWithFancyBox() {
   $('img').not('#header img').each(function () {
     var $image = $(this);
     var imageCaption = $image.attr('alt');
@@ -368,4 +368,4 @@ function wrapImageWithFancyBox() {
       autoStart: false
     }
   });
-}
+}*/
