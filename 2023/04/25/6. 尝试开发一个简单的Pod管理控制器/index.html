@@ -308,7 +308,7 @@
 <h3 id="1-开发目标"><a class="markdownIt-Anchor" href="#1-开发目标"></a> 1. 开发目标</h3>
 <p>类比于Deployment可以管理Pod，我们现在尝试开发一个简单的Pod管理控制器Application Operator，但是暂时只支持Pod副本数的管理。</p>
 <p>我们要通过一个Application类型来定义一个自己的资源对象，然后在控制器中获取这个资源对象的详细配置，接着根据它的配置去创建相应数量的Pod，就像De-ployment那样工作。当然，为了避免Demo项目过于复杂，这里不去考虑过多的异常处理、程序健壮性、业务逻辑完备等。</p>
-<p><img src="../images/application_operator_function.png" alt="that's the way" /></p>
+<p><img src="/images/application_operator_function.png" alt="that's the way" /></p>
 <h3 id="2-初始化项目"><a class="markdownIt-Anchor" href="#2-初始化项目"></a> 2. 初始化项目</h3>
 <p>创建文件夹组，创建文件夹，在里面执行以下语句</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubebuilder init --domain=danielhu.cn --repo=github.com/daniel-hutao/application-operator --owner Daniel.Hu</span><br></pre></td></tr></table></figure>
@@ -466,7 +466,7 @@ make: *** [install] 错误 1</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;time&quot;</span></span><br><span class="line"></span><br><span class="line">	corev1 <span class="string">&quot;k8s.io/api/core/v1&quot;</span></span><br><span class="line">	<span class="string">&quot;k8s.io/apimachinery/pkg/api/errors&quot;</span></span><br><span class="line">	metav1 <span class="string">&quot;k8s.io/apimachinery/pkg/apis/meta/v1&quot;</span></span><br><span class="line">	<span class="string">&quot;k8s.io/apimachinery/pkg/runtime&quot;</span></span><br><span class="line">	ctrl <span class="string">&quot;sigs.k8s.io/controller-runtime&quot;</span></span><br><span class="line">	<span class="string">&quot;sigs.k8s.io/controller-runtime/pkg/client&quot;</span></span><br><span class="line">	<span class="string">&quot;sigs.k8s.io/controller-runtime/pkg/log&quot;</span></span><br><span class="line">	</span><br><span class="line">	dappsv1 <span class="string">&quot;github.com/daniel-hutao/application-operator/api/v1&quot;</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
 <p>这里我们把自己的api/v1打包并使用别名dappsv1，<a target="_blank" rel="noopener" href="http://xn--k8s-9s1el2m457i.io/api/apps/v1%E5%8C%85%E4%BA%A7%E7%94%9F%E6%B7%B7%E6%B7%86%E3%80%82">避免和k8s.io/api/apps/v1包产生混淆。</a></p>
 <p>代码解释：</p>
-<p><img src="../images/go_explain.png" alt="go_explain" /></p>
+<p><img src="/images/go_explain.png" alt="go_explain" /></p>
 <p>启动controller：执行make run</p>
 <p><strong>报错</strong></p>
 <blockquote>
@@ -501,7 +501,7 @@ make: *** [install] 错误 1</p>
 <p>卸载Controller：<code>make undeploy</code></p>
 <p>卸载CRD：<code>make uninstall</code></p>
 <h3 id="9总结与理解"><a class="markdownIt-Anchor" href="#9总结与理解"></a> 9.总结与理解</h3>
-<p><img src="../images/summarize_helloworld.png" alt="" /></p>
+<p><img src="/images/summarize_helloworld.png" alt="" /></p>
 <h3 id="10-受锤感悟"><a class="markdownIt-Anchor" href="#10-受锤感悟"></a> 10. 受锤感悟</h3>
 <p>在做的过程中一次次的遇到各种问题，环境、网络、版本匹配、敲错命令找半天、k8s莫名升级到最新版本、教程有误…各种错误，无一不让我心头焦灼攥紧拳头火冒三丈，心灰意冷。</p>
 <p>不断遇到问题，不断解决问题，这个过程很痛苦，但是问题解决的那一刻很有成就感。</p>

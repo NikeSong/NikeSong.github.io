@@ -317,7 +317,7 @@
 <h3 id="1-pod基础"><a class="markdownIt-Anchor" href="#1-pod基础"></a> 1 Pod基础</h3>
 <h4 id="11-pause容器"><a class="markdownIt-Anchor" href="#11-pause容器"></a> 1.1 Pause容器</h4>
 <p>上文我们说了Pod就像一个豆荚，里面运行着容器。这些容器里面有一个显得尤为特殊，它叫做Pause。</p>
-<p><img src="../images/pod_pause.png" alt="pod_pause" /></p>
+<p><img src="/images/pod_pause.png" alt="pod_pause" /></p>
 <p>Pause容器又叫根容器，它随Pod的建立而建立，其他pod都会从pause容器中fork出来。它掌握了此Pod的网络栈和存储资源。同一Pod的容器可以共享Pause的网络栈和Volume存储（Volume是Pod中能够被多个容器访问的共享目录），因此他们之间通信和数据交换更为高效，在设计时我们可以充分利用这一特性将一组密切相关的服务进程放入同一个Pod中。同一个Pod里的容器之间仅需通过localhost就能互相通信。</p>
 <h4 id="12-pod的标签"><a class="markdownIt-Anchor" href="#12-pod的标签"></a> 1.2 Pod的标签</h4>
 <h3 id="2-pod的生命周期"><a class="markdownIt-Anchor" href="#2-pod的生命周期"></a> 2 Pod的生命周期</h3>
@@ -346,7 +346,7 @@
 </ul>
 <p>下面逐一介绍各个过程中涉及到的技术细节，各个组件的配合实现方法。</p>
 <h4 id="21-pod的创建"><a class="markdownIt-Anchor" href="#21-pod的创建"></a> 2.1 Pod的创建</h4>
-<p><img src="../images/Pod_create.png" alt="Pod_create" /></p>
+<p><img src="/images/Pod_create.png" alt="Pod_create" /></p>
 <ul>
 <li>
 <p>首先用户通过kubectl提交需要创建的pod信息给Api Server。</p>
@@ -355,11 +355,11 @@
 <p>Api Server开始生成pod对象的信息，并将信息存入etcd，然后立即返回确认信息至客户端。</p>
 </li>
 </ul>
-<p><img src="../images/pod_init.png" alt="pod_init" /></p>
+<p><img src="/images/pod_init.png" alt="pod_init" /></p>
 <ul>
 <li>Api Server开始读取etcd中的Pod信息，反映其中pod对象的变化，其它组件使用watch机制来跟踪检查Api Server上的变动。</li>
 </ul>
-<p><img src="../images/pod_init2.png" alt="pod_init2" /></p>
+<p><img src="/images/pod_init2.png" alt="pod_init2" /></p>
 <ul>
 <li>
 <p>scheduler发现有新的pod对象要创建，开始为Pod分配主机并将结果信息更新至Api Server。</p>
@@ -368,7 +368,7 @@
 <p>node节点上的kubelet发现有pod调度过来，开始工作。</p>
 </li>
 </ul>
-<p><img src="../images/pod_init3.png" alt="pod_init3" /></p>
+<p><img src="/images/pod_init3.png" alt="pod_init3" /></p>
 <ul>
 <li>Kubelet尝试创建容器，并将创建结果回送至Api Server。</li>
 <li>Api Server将接收到的pod状态信息存入etcd中。</li>
@@ -383,7 +383,7 @@
 <li>失败（Failed）：所有容器都已经终止，但至少有一个容器终止失败，即容器返回了非0值的退出状态</li>
 <li>未知（Unknown）：apiserver无法正常获取到pod对象的状态信息，通常由网络通信失败所导致</li>
 </ul>
-<p><img src="../images/lifetime.png" alt="lifetime" /></p>
+<p><img src="/images/lifetime.png" alt="lifetime" /></p>
 <p><strong>初始化容器</strong></p>
 <p>初始化容器是在pod的主容器启动之前要运行的容器，可以有一个或者多个。它主要是做一些主容器的前置工作，具有两大特征：</p>
 <ol>
@@ -413,7 +413,7 @@
 </ul>
 <p>​    重启策略适用于pod对象中的所有容器，首次需要重启的容器，将在其需要时立即进行重启，随后再次需要重启的操作将由kubelet延迟一段时间后进行，且反复的重启操作的延迟时长以此为10s、20s、40s、80s、160s和300s，300s是最大延迟时长。</p>
 <h4 id="23-pod的终止过程"><a class="markdownIt-Anchor" href="#23-pod的终止过程"></a> 2.3 Pod的终止过程</h4>
-<p><img src="../images/pod_terminate.png" alt="pod_terminate" /></p>
+<p><img src="/images/pod_terminate.png" alt="pod_terminate" /></p>
 <p>这个过程同样是Master中各个组件合作完成的，此处不再做细节展示。</p>
 <ul>
 <li>
@@ -426,7 +426,7 @@
 <p>将pod标记为terminating状态。</p>
 </li>
 </ul>
-<p><img src="../images/pod_terminate3.png" alt="pod_terminate3" /></p>
+<p><img src="/images/pod_terminate3.png" alt="pod_terminate3" /></p>
 <ul>
 <li>kubelet在监控到pod对象转为terminating状态的同时启动pod关闭过程。</li>
 <li>端点控制器监控到pod对象的关闭行为时将其从所有匹配到此端点的service资源的端点列表中移除。</li>
@@ -464,12 +464,12 @@
 <li>NoSchedule：kubernetes将不会把Pod调度到具有该污点的Node上，但不会影响当前Node上已存在的Pod</li>
 <li>NoExecute：kubernetes将不会把Pod调度到具有该污点的Node上，同时也会将Node上已存在的Pod驱离</li>
 </ul>
-<p><img src="../images/flaw.png" alt="flaw" /></p>
+<p><img src="/images/flaw.png" alt="flaw" /></p>
 <p>使用kubectl设置和去除污点的命令示例如下：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">设置污点</span></span><br><span class="line">kubectl taint nodes node1 key=value:effect</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">去除污点</span></span><br><span class="line">kubectl taint nodes node1 key:effect-</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">去除所有污点</span></span><br><span class="line">kubectl taint nodes node1 key-</span><br></pre></td></tr></table></figure>
 <p><strong>容忍（Toleration）</strong></p>
 <p>上面介绍了污点的作用，我们可以在node上添加污点用于拒绝pod调度上来，但是如果就是想将一个pod调度到一个有污点的node上去，这时候应该怎么做呢？这就要使用到<strong>容忍</strong>。污点就是拒绝，容忍就是忽略，Node通过污点拒绝pod调度上去，Pod通过容忍忽略拒绝。</p>
-<p><img src="../images/ressitence.png" alt="ressitence" /></p>
+<p><img src="/images/ressitence.png" alt="ressitence" /></p>
 <p>设置方式如下</p>
 <figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Pod</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">pod-toleration</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">dev</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">nginx</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">nginx:1.17.1</span></span><br><span class="line">  <span class="attr">tolerations:</span>      <span class="comment"># 添加容忍</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">key:</span> <span class="string">&quot;tag&quot;</span>        <span class="comment"># 要容忍的污点的key</span></span><br><span class="line">    <span class="attr">operator:</span> <span class="string">&quot;Equal&quot;</span> <span class="comment"># 操作符</span></span><br><span class="line">    <span class="attr">value:</span> <span class="string">&quot;heima&quot;</span>    <span class="comment"># 容忍的污点的value</span></span><br><span class="line">    <span class="attr">effect:</span> <span class="string">&quot;NoExecute&quot;</span>   <span class="comment"># 添加容忍的规则，这里必须和标记的污点规则相同</span></span><br></pre></td></tr></table></figure>
 <h3 id="4-总结从配置文件看pod"><a class="markdownIt-Anchor" href="#4-总结从配置文件看pod"></a> 4 总结：从配置文件看Pod</h3>

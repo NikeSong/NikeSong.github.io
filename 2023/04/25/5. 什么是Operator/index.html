@@ -324,7 +324,7 @@
 </blockquote>
 <p>就是，原始的资源被controller manager控制，但是这时候你想自己写一些资源（CR），那么这些自定义资源也需要一个类似controller manager的东西管理啊！那就是自己写一个controller！</p>
 <p>我的理解，他们三个是这样的：</p>
-<p><img src="../images/newcrcrdcontroller.png" alt="newcrcrdcontroller" /></p>
+<p><img src="/images/newcrcrdcontroller.png" alt="newcrcrdcontroller" /></p>
 <p>首先用户操作kubectl输入命令对资源X做操作，api-server反映资源X的状态，当自定义的controller监听到相应的任务时会使用其内部的CR（Pod控制器）操作相应的Pod，把操作后的结果写入api-server，此时Node中的Kubelet看到了它应该做的工作，于是去操作相应的Pod。</p>
 <p>同时，当集群运行的过程中Pod的状态不符合CD的规定/预期的时候，同样会进行上述的过程，完成对Pod状态的约束控制。</p>
 <h2 id="2-控制器模式"><a class="markdownIt-Anchor" href="#2-控制器模式"></a> 2. 控制器模式</h2>

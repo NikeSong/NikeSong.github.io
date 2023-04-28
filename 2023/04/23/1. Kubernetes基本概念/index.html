@@ -312,23 +312,23 @@
 <p>q: 为什么是单数？</p>
 <p>因为在执行类似于投票的工作时双数会出现平票，单数避免了这样的问题。</p>
 </blockquote>
-<p><img src="../images/s1.png" alt="s1" /></p>
+<p><img src="/images/s1.png" alt="s1" /></p>
 <h2 id="2-结构拆解"><a class="markdownIt-Anchor" href="#2-结构拆解"></a> 2 结构拆解</h2>
 <h3 id="21-结构分析"><a class="markdownIt-Anchor" href="#21-结构分析"></a> 2.1 结构分析</h3>
-<p><img src="../images/s2.png" alt="s2" /></p>
+<p><img src="/images/s2.png" alt="s2" /></p>
 <p><strong>首先从Node节点看起。</strong></p>
-<p><img src="../images/s_node.png" alt="s_node" /></p>
+<p><img src="/images/s_node.png" alt="s_node" /></p>
 <ul>
 <li>Node方块中的最小单位是Pod，Pod直译为豆荚，是K8s控制和调度的最小单位，也是一切工作的关注核心。理解为豆荚是非常直观的，因为这里面运行了一个个的容器，每个容器可以理解为一个豆子。容器中运行着我们部署的程序。看我下面画的是不是挺像豌豆 😃</li>
 </ul>
-<p><img src="../images/pod.png" alt="pod" /></p>
+<p><img src="/images/pod.png" alt="pod" /></p>
 <ul>
 <li>为了实现pod的灵活控制，我们把pod做了分组，交由pod controller管理。pod controller其实是Master中的Controller Manager提供的功能。一个pod controller保存了其下属的pod的模板，拿到了pod controller我们就可以随意的创建、销毁、修改一组pod。当pod controller下属的pod被删除或者出故障后，pod controller会重建一个pod代替它。</li>
 <li>pod随时可能被销毁和重建，为了保证pod中应用程序的数据安全，把数据存储在pvc中。pvc它是k8s提供的存储服务，pvc中的数据未必就存储在当前机器上，它相当于是一个服务接口，其实现可以是各异的（类似于接口有很多实现类，用不同的方式实现了安全的存储，但是这些你无需关心，调接口用就完事了）。</li>
 <li>namespace的功能就是实现pod等资源的隔离，在某namespace中看不到其他namespace中的资源。</li>
 </ul>
 <p><strong>下面我们先换个角度，从Master看起。</strong></p>
-<p><img src="../images/s_master.png" alt="s_master" /></p>
+<p><img src="/images/s_master.png" alt="s_master" /></p>
 <ul>
 <li>Kubectl是我们控制集群的工具，Linux命令行交互工具。我们所有的控制命令都是通过这个组件下发到集群中的，这个组件在Master节点和Node节点上都可以存在，所以这里我把它画在了外部。</li>
 <li>Api server是Master中最核心的控制组件，其他组件都需要通过和他做交互实现相应的功能。这里的“功能”几乎涉及了k8s的各种服务，比如pod的创建、销毁、调度，服务的暴露等（相关概念后面的文章中会介绍）。</li>

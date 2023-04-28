@@ -304,7 +304,7 @@
 
 <!-- content -->
 <div id="article-content">
-	<p><img src="../images/client-go.png" alt="client-go" /></p>
+	<p><img src="/images/client-go.png" alt="client-go" /></p>
 <p>Kubernetes中的资源本质就是一个API对象，这个对象的“期望状态”被API Server保存在ETCD中，然后提供RESTful接口用于更新这些对象。我们可以直接和API Server交互，使用“声明”的方式来管理这些资源（API对象），也可以通过kubectl这种命令行工具，或者client-go这类SDK。</p>
 <p>我们可以在Kubernetes的官网中找到API文档：<a target="_blank" rel="noopener" href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/%E3%80%82">https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/。</a></p>
 <p>因为各个组件都是通过与api-server交互做的功能实现，所以如何与api-server做交互是扩展开发中的重中之重。下面我们以一个Deployment资源的增删改查操作为例，看一下如何与API Server交互。</p>
