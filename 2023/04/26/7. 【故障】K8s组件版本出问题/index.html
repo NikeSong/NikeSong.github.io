@@ -306,12 +306,12 @@
 <div id="article-content">
 	<h3 id="k8s组件版本自动升级了"><a class="markdownIt-Anchor" href="#k8s组件版本自动升级了"></a> K8s组件版本自动升级了？</h3>
 <p>报错</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">The connection to the server 192.168.62.128:6443 was refused - did you specify the right host or port?</span><br><span class="line">make: *** [install] 错误 1</span><br><span class="line"></span><br><span class="line">K8s集群不管用了！</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">The connection to the server 192.168.62.128:6443 was refused - did you specify the right host or port?</span><br><span class="line">make: *** [install] 错误 1</span><br><span class="line"></span><br><span class="line">K8s集群不管用了！</span><br></pre></td></tr></table></figure>
 <p>首先考虑是通信的问题，想起来自己最开始配置的域名解析只考虑了静态ip的状况，自己现在已经是动态ip了。</p>
-<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 主机名成解析 编辑三台服务器的/etc/hosts文件，添加下面内容</span></span><br><span class="line"><span class="number">192.168</span>.<span class="number">62.128</span>  master</span><br><span class="line"><span class="number">192.168</span>.<span class="number">62.134</span>  node1</span><br><span class="line"><span class="number">192.168</span>.<span class="number">62.131</span>  node2</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 主机名成解析 编辑三台服务器的/etc/hosts文件，添加下面内容</span><br><span class="line">192.168.62.128  master</span><br><span class="line">192.168.62.134  node1</span><br><span class="line">192.168.62.131  node2</span><br></pre></td></tr></table></figure>
 <p>修改后仍不管用，查看自己的kube版本</p>
 <p><code>rpm -qa|grep kube</code></p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">kubeadm-1.27.1-0.x86_64</span><br><span class="line">kubelet-1.27.1-0.x86_64</span><br><span class="line">kubectl-1.27.1-0.x86_64</span><br><span class="line">kubernetes-cni-1.2.0-0.x86_64</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">kubeadm-1.27.1-0.x86_64</span><br><span class="line">kubelet-1.27.1-0.x86_64</span><br><span class="line">kubectl-1.27.1-0.x86_64</span><br><span class="line">kubernetes-cni-1.2.0-0.x86_64</span><br></pre></td></tr></table></figure>
 <p>不知道为啥变了版本，全给我整成最新的了，我真的服了。</p>
 <p>原来是</p>
 <p>docker（18.06.3）</p>
@@ -321,7 +321,7 @@
 <p>降级</p>
 <p><code>yum downgrade kubeadm-1.17.4 kubelet-1.17.4 kubectl-1.17.4</code></p>
 <p>降级后再次查询</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">root@master ~]# rpm -qa|grep kube</span><br><span class="line">kubeadm-1.17.4-0.x86_64</span><br><span class="line">kubelet-1.17.4-0.x86_64</span><br><span class="line">kubernetes-cni-1.2.0-0.x86_64</span><br><span class="line">kubectl-1.17.4-0.x86_64</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">root@master ~]# rpm -qa|grep kube</span><br><span class="line">kubeadm-1.17.4-0.x86_64</span><br><span class="line">kubelet-1.17.4-0.x86_64</span><br><span class="line">kubernetes-cni-1.2.0-0.x86_64</span><br><span class="line">kubectl-1.17.4-0.x86_64</span><br></pre></td></tr></table></figure>
 <p>集群恢复正常。</p>
 <blockquote>
 <p>Notes：</p>

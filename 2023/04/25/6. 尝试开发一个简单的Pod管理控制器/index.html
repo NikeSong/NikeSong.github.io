@@ -311,7 +311,7 @@
 <p><img src="/images/application_operator_function.png" alt="that's the way" /></p>
 <h3 id="2-初始化项目"><a class="markdownIt-Anchor" href="#2-初始化项目"></a> 2. 初始化项目</h3>
 <p>创建文件夹组，创建文件夹，在里面执行以下语句</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubebuilder init --domain=danielhu.cn --repo=github.com/daniel-hutao/application-operator --owner Daniel.Hu</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubebuilder init --domain=danielhu.cn --repo=github.com/daniel-hutao/application-operator --owner Daniel.Hu</span><br></pre></td></tr></table></figure>
 <p>参数含义</p>
 <ul>
 <li><code>–-domain lailin.xyz</code> 我们的项目的域名</li>
@@ -320,7 +320,7 @@
 <p><strong>报错1：</strong></p>
 <blockquote>
 <p>如果你 <code>golang</code> 版本过低或者过高都有可能出现下方的错误信息，我这里是因为使用的 <code>1.16</code> 版本太高了</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2021/04/25 20:47:14 failed to initialize project: unable to run pre-scaffold tasks of &quot;base.go.kubebuilder.io/v3&quot;: go version &#x27;go1.16&#x27; is incompatible because &#x27;requires 1.13 &lt;= version &lt; 1.16&#x27;. You can skip this check using the --skip-go-version-check flag</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2021/04/25 20:47:14 failed to initialize project: unable to run pre-scaffold tasks of &quot;base.go.kubebuilder.io/v3&quot;: go version &#x27;go1.16&#x27; is incompatible because &#x27;requires 1.13 &lt;= version &lt; 1.16&#x27;. You can skip this check using the --skip-go-version-check flag</span><br></pre></td></tr></table></figure>
 <p>这种情况下可以添加 <code>--skip-go-version-check</code> 忽略这个错误</p>
 </blockquote>
 <p><strong>报错2：</strong></p>
@@ -332,186 +332,290 @@
 <p>修改环境变量</p>
 <ul>
 <li>
-<pre class="highlight"><code class="shell">vi /etc/profile
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">- 最下面加上：</span><br><span class="line"></span><br><span class="line">  ```shell</span><br><span class="line">  export PATH=$PATH:/usr/local/xxx/bin</span><br></pre></td></tr></table></figure>
-
+<pre class="highlight"><code class="">vi /etc/profile
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">- 最下面加上：</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+export PATH=$PATH:/usr/local/xxx/bin
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">- 刷新环境变量</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+source /etc/profile
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">**报错3：**</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 </code></pre>
 </li>
-<li>
-<p>刷新环境变量</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">source /etc/profile</span><br></pre></td></tr></table></figure>
-</li>
 </ul>
 </blockquote>
+<p>Error: failed to initialize project: unable to scaffold with “<a target="_blank" rel="noopener" href="http://base.go.kubebuilder.io/ve">base.go.kubebuilder.io/ve</a>”: exit status l</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Go的版本不匹配，我用的是1.17.6，改为1.10.4，看到别人用1.18.5改为1.18.5</span><br><span class="line"></span><br><span class="line">&gt; 仍然报错，研究一下午 + 一晚上看了各种文档和issue仍然解决不了，心如死灰欲哭无泪，正准备明天把虚拟机从头到尾都换成和教程同样的版本时跟室友抱怨起这个问题。</span><br><span class="line">&gt;</span><br><span class="line">&gt; 他很感兴趣，趴我电脑旁边看问题，我当时回宿舍用的是自己笔记本远程登陆实验室电脑，实验室电脑开虚拟机+vpn，一打开vpn整个画面卡成PPT，但是就在这样的极端恶劣的情况下，我们又换谷歌搜索看了几个文章，仍未解决。</span><br><span class="line">&gt;</span><br><span class="line">&gt; 后来他说你把这个报错信息发给我我再看看，他收到后第一时间打开了ChatGPT😂GPT说可能是GOBIN环境没配好，我又检查了环境，说可能是网络问题，我寻思网络能有啥问题，我ping集群ping百度都没问题。。。。</span><br><span class="line">&gt;</span><br><span class="line">&gt; 。。。。</span><br><span class="line">&gt;</span><br><span class="line">&gt; 。。。。</span><br><span class="line">&gt;</span><br><span class="line">&gt; 卧槽，我之前初始化项目的时候是不是都没开VPN？</span><br><span class="line">&gt;</span><br><span class="line">&gt; 我试着打开VPN，重新敲入那句今天已经敲了100遍的命令`kubebuilder init XXXX`,它竟然开始显示在github上下载go的什么什么东西，一长串占满了屏幕。。。此时我已呆住。</span><br><span class="line">&gt;</span><br><span class="line">&gt; 问题解决。</span><br><span class="line">&gt;</span><br><span class="line">&gt; (之前一直觉得chatGPT被吹得过头了，产生了很反感的情绪，觉得也就是外行人才把它视作神明，吹上了天。现在感觉这玩意还是能提供一些思路的)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">**项目文件结构分析**</span><br><span class="line"></span><br><span class="line">初始化完之后我的项目结构</span><br><span class="line"></span><br><span class="line">.</span><br><span class="line">├── config</span><br><span class="line">│   ├── default</span><br><span class="line">│   │   ├── kustomization.yaml</span><br><span class="line">│   │   ├── manager_auth_proxy_patch.yaml</span><br><span class="line">│   │   └── manager_config_patch.yaml</span><br><span class="line">│   ├── manager</span><br><span class="line">│   │   ├── controller_manager_config.yaml</span><br><span class="line">│   │   ├── kustomization.yaml</span><br><span class="line">│   │   └── manager.yaml</span><br><span class="line">│   ├── prometheus</span><br><span class="line">│   │   ├── kustomization.yaml</span><br><span class="line">│   │   └── monitor.yaml</span><br><span class="line">│   └── rbac</span><br><span class="line">│       ├── auth_proxy_client_clusterrole.yaml</span><br><span class="line">│       ├── auth_proxy_role_binding.yaml</span><br><span class="line">│       ├── auth_proxy_role.yaml</span><br><span class="line">│       ├── auth_proxy_service.yaml</span><br><span class="line">│       ├── kustomization.yaml</span><br><span class="line">│       ├── leader_election_role_binding.yaml</span><br><span class="line">│       ├── leader_election_role.yaml</span><br><span class="line">│       ├── role_binding.yaml</span><br><span class="line">│       └── service_account.yaml</span><br><span class="line">├── Dockerfile</span><br><span class="line">├── go.mod</span><br><span class="line">├── go.sum</span><br><span class="line">├── hack</span><br><span class="line">│   └── boilerplate.go.txt</span><br><span class="line">├── main.go</span><br><span class="line">├── Makefile</span><br><span class="line">├── PROJECT</span><br><span class="line">└── README.md</span><br><span class="line"></span><br><span class="line">大致看一下其中的几个文件</span><br><span class="line"></span><br><span class="line">- PROJECT：记录元数据</span><br><span class="line">- main.go：重要的文件，此处先不做分析。注意到文件头有copyright信息，这个信息来自hack/boilerplate.go.txt文件。</span><br><span class="line">- config：这个目录中放置了很多个YAML文件。其中包括RBAC权限相关的YAML文件、Prometheus监控服务发现（ServiceMonitor）相关的YAML文件、控制器（Manager）本身部署的YAML文件等。</span><br><span class="line">- Dockerfile：最终Operator程序编译、构建镜像的逻辑就在这里，我们可以通过修改这个文件来解决一些镜像构建相关的问题，比如Go语言依赖下载的默认GOPROXY配置在国内不一定能访问到，可以在其中配置国内的proxy地址等。</span><br><span class="line">- Makefile：这是解放劳动力的工具，这里实现了通过make ×××轻松实现整个程序的编译构建、镜像推送、部署、卸载等操作，后面会经常用到。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">### 3. 添加API</span><br><span class="line"></span><br><span class="line">在application-operator目录下继续执行命令，连续输入两次y：</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 </blockquote>
-<p><strong>报错3：</strong></p>
-<blockquote>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Error: failed to initialize project: unable to scaffold with &quot;base.go.kubebuilder.io/ve&quot;: exit status l</span><br></pre></td></tr></table></figure>
-<p>Go的版本不匹配，我用的是1.17.6，改为1.10.4，看到别人用1.18.5改为1.18.5</p>
-<blockquote>
-<p>仍然报错，研究一下午 + 一晚上看了各种文档和issue仍然解决不了，心如死灰欲哭无泪，正准备明天把虚拟机从头到尾都换成和教程同样的版本时跟室友抱怨起这个问题。</p>
-<p>他很感兴趣，趴我电脑旁边看问题，我当时回宿舍用的是自己笔记本远程登陆实验室电脑，实验室电脑开虚拟机+vpn，一打开vpn整个画面卡成PPT，但是就在这样的极端恶劣的情况下，我们又换谷歌搜索看了几个文章，仍未解决。</p>
-<p>后来他说你把这个报错信息发给我我再看看，他收到后第一时间打开了ChatGPT😂GPT说可能是GOBIN环境没配好，我又检查了环境，说可能是网络问题，我寻思网络能有啥问题，我ping集群ping百度都没问题。。。。</p>
-<p>。。。。</p>
-<p>。。。。</p>
-<p>卧槽，我之前初始化项目的时候是不是都没开VPN？</p>
-<p>我试着打开VPN，重新敲入那句今天已经敲了100遍的命令<code>kubebuilder init XXXX</code>,它竟然开始显示在github上下载go的什么什么东西，一长串占满了屏幕。。。此时我已呆住。</p>
-<p>问题解决。</p>
-<p>(之前一直觉得chatGPT被吹得过头了，产生了很反感的情绪，觉得也就是外行人才把它视作神明，吹上了天。现在感觉这玩意还是能提供一些思路的)</p>
-</blockquote>
-</blockquote>
-<p><strong>项目文件结构分析</strong></p>
-<p>初始化完之后我的项目结构</p>
-<p>.<br />
-├── config<br />
-│   ├── default<br />
-│   │   ├── kustomization.yaml<br />
-│   │   ├── manager_auth_proxy_patch.yaml<br />
-│   │   └── manager_config_patch.yaml<br />
-│   ├── manager<br />
-│   │   ├── controller_manager_config.yaml<br />
-│   │   ├── kustomization.yaml<br />
-│   │   └── manager.yaml<br />
-│   ├── prometheus<br />
-│   │   ├── kustomization.yaml<br />
-│   │   └── monitor.yaml<br />
-│   └── rbac<br />
-│       ├── auth_proxy_client_clusterrole.yaml<br />
-│       ├── auth_proxy_role_binding.yaml<br />
-│       ├── auth_proxy_role.yaml<br />
-│       ├── auth_proxy_service.yaml<br />
-│       ├── kustomization.yaml<br />
-│       ├── leader_election_role_binding.yaml<br />
-│       ├── leader_election_role.yaml<br />
-│       ├── role_binding.yaml<br />
-│       └── service_account.yaml<br />
-├── Dockerfile<br />
-├── go.mod<br />
-├── go.sum<br />
-├── hack<br />
-│   └── boilerplate.go.txt<br />
-├── main.go<br />
-├── Makefile<br />
-├── PROJECT<br />
-└── <a target="_blank" rel="noopener" href="http://README.md">README.md</a></p>
-<p>大致看一下其中的几个文件</p>
+<p>kubebuilder create api --group apps --version v1 --kind Application</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+<p>[root@master application-operator]# kubebuilder create api --group apps --version v1 --kind Application<br />
+Create Resource [y/n]<br />
+y<br />
+Create Controller [y/n]<br />
+y<br />
+Writing kustomize manifests for you to edit…<br />
+Writing scaffold for you to edit…<br />
+api/v1/application_types.go<br />
+controllers/application_controller.go<br />
+Update dependencies:<br />
+$ go mod tidy<br />
+go: downloading <a href="http://github.com/onsi/ginkgo/v2">github.com/onsi/ginkgo/v2</a> v2.0.0<br />
+Running make:<br />
+$ make generate<br />
+…</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">新增了很多文件夹和文件，尤其是api文件夹比较重要；部分文件有改动，此时可以通过git status观察到。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">### 4. CRD实现和部署</span><br><span class="line"></span><br><span class="line">我们前面提到过CRD的代码主要定义在**api/v1/application_types.go**文件中，先打开看一下现有代码是怎样的。主要看Spec结构，也就是ApplicationSpec这个结构体的定义：</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>type ApplicationSpec struct {<br />
+Foo string <code>json:&quot;foo,omitempty&quot;</code><br />
+}</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">增加内容如下</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>import (<br />
+corev1 “<a target="_blank" rel="noopener" href="http://k8s.io/api/core/v1">k8s.io/api/core/v1</a>”<br />
+metav1 “<a target="_blank" rel="noopener" href="http://k8s.io/apimachinery/pkg/apis/meta/v1">k8s.io/apimachinery/pkg/apis/meta/v1</a>”<br />
+)</p>
+<p>// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!<br />
+// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.</p>
+<p>// ApplicationSpec defines the desired state of Application<br />
+type ApplicationSpec struct {<br />
+Replicas int32                  <code>json:&quot;replicas,omitempty&quot;</code><br />
+Template corev1.PodTemplateSpec <code>json:&quot;template,omitempty&quot;</code><br />
+}</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line">然后保存调用命令` make manifests`，显示如下</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>/root/MyOPeratorProjects/application-operator/bin/controller-gen rbac:roleName=manager-role crd webhook paths=&quot;./…&quot; output:crd:artifacts:config=config/crd/bases</p>
+<h2 id="-code10-"><a class="markdownIt-Anchor" href="#-code10-"></a> <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">看一下这两个文件/目录：</span><br><span class="line"></span><br><span class="line">1. **·config/crd/bases/：**这个目录中新增了一个**apps.danielhu.cn_applications.yaml**文件，也就是Application类型的CRD配置：</span><br><span class="line"></span><br></pre></td></tr></table></figure></h2>
+<p>apiVersion: <a target="_blank" rel="noopener" href="http://apiextensions.k8s.io/v1">apiextensions.k8s.io/v1</a><br />
+kind: CustomResourceDefinition<br />
+metadata:<br />
+annotations:<br />
+<a target="_blank" rel="noopener" href="http://controller-gen.kubebuilder.io/version:">controller-gen.kubebuilder.io/version:</a> v0.9.2<br />
+creationTimestamp: null<br />
+name: <a target="_blank" rel="noopener" href="http://applications.apps.danielhu.cn">applications.apps.danielhu.cn</a><br />
+spec:<br />
+group: <a target="_blank" rel="noopener" href="http://apps.danielhu.cn">apps.danielhu.cn</a><br />
+names:<br />
+kind: Application<br />
+listKind: ApplicationList<br />
+plural: applications<br />
+singular: application<br />
+scope: Namespaced<br />
+versions:</p>
 <ul>
-<li>PROJECT：记录元数据</li>
-<li>main.go：重要的文件，此处先不做分析。注意到文件头有copyright信息，这个信息来自hack/boilerplate.go.txt文件。</li>
-<li>config：这个目录中放置了很多个YAML文件。其中包括RBAC权限相关的YAML文件、Prometheus监控服务发现（ServiceMonitor）相关的YAML文件、控制器（Manager）本身部署的YAML文件等。</li>
-<li>Dockerfile：最终Operator程序编译、构建镜像的逻辑就在这里，我们可以通过修改这个文件来解决一些镜像构建相关的问题，比如Go语言依赖下载的默认GOPROXY配置在国内不一定能访问到，可以在其中配置国内的proxy地址等。</li>
-<li>Makefile：这是解放劳动力的工具，这里实现了通过make ×××轻松实现整个程序的编译构建、镜像推送、部署、卸载等操作，后面会经常用到。</li>
+<li>name: v1</li>
 </ul>
-<h3 id="3-添加api"><a class="markdownIt-Anchor" href="#3-添加api"></a> 3. 添加API</h3>
-<p>在application-operator目录下继续执行命令，连续输入两次y：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubebuilder create api --group apps --version v1 --kind Application</span><br></pre></td></tr></table></figure>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[root@master application-operator]# kubebuilder create api --group apps --version v1 --kind Application</span><br><span class="line">Create Resource [y/n]</span><br><span class="line">y</span><br><span class="line">Create Controller [y/n]</span><br><span class="line">y</span><br><span class="line">Writing kustomize manifests for you to edit...</span><br><span class="line">Writing scaffold for you to edit...</span><br><span class="line">api/v1/application_types.go</span><br><span class="line">controllers/application_controller.go</span><br><span class="line">Update dependencies:</span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">go mod tidy</span></span><br><span class="line">go: downloading github.com/onsi/ginkgo/v2 v2.0.0</span><br><span class="line">Running make:</span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">make generate</span></span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-<p>新增了很多文件夹和文件，尤其是api文件夹比较重要；部分文件有改动，此时可以通过git status观察到。</p>
-<h3 id="4-crd实现和部署"><a class="markdownIt-Anchor" href="#4-crd实现和部署"></a> 4. CRD实现和部署</h3>
-<p>我们前面提到过CRD的代码主要定义在<strong>api/v1/application_types.go</strong>文件中，先打开看一下现有代码是怎样的。主要看Spec结构，也就是ApplicationSpec这个结构体的定义：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> ApplicationSpec <span class="keyword">struct</span> &#123;</span><br><span class="line">	Foo <span class="type">string</span> <span class="string">`json:&quot;foo,omitempty&quot;`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>增加内容如下</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	corev1 <span class="string">&quot;k8s.io/api/core/v1&quot;</span></span><br><span class="line">	metav1 <span class="string">&quot;k8s.io/apimachinery/pkg/apis/meta/v1&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!</span></span><br><span class="line"><span class="comment">// <span class="doctag">NOTE:</span> json tags are required.  Any new fields you add must have json tags for the fields to be serialized.</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// ApplicationSpec defines the desired state of Application</span></span><br><span class="line"><span class="keyword">type</span> ApplicationSpec <span class="keyword">struct</span> &#123;</span><br><span class="line">	Replicas <span class="type">int32</span>                  <span class="string">`json:&quot;replicas,omitempty&quot;`</span></span><br><span class="line">	Template corev1.PodTemplateSpec <span class="string">`json:&quot;template,omitempty&quot;`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>然后保存调用命令<code>make manifests</code>，显示如下</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/root/MyOPeratorProjects/application-operator/bin/controller-gen rbac:roleName=manager-role crd webhook paths=&quot;./...&quot; output:crd:artifacts:config=config/crd/bases</span><br></pre></td></tr></table></figure>
-<p>看一下这两个文件/目录：</p>
-<ol>
-<li><strong>·config/crd/bases/：<strong>这个目录中新增了一个</strong>apps.danielhu.cn_applications.yaml</strong>文件，也就是Application类型的CRD配置：</li>
-</ol>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">apiextensions.k8s.io/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">CustomResourceDefinition</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">annotations:</span></span><br><span class="line">    <span class="attr">controller-gen.kubebuilder.io/version:</span> <span class="string">v0.9.2</span></span><br><span class="line">  <span class="attr">creationTimestamp:</span> <span class="literal">null</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">applications.apps.danielhu.cn</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">group:</span> <span class="string">apps.danielhu.cn</span></span><br><span class="line">  <span class="attr">names:</span></span><br><span class="line">    <span class="attr">kind:</span> <span class="string">Application</span></span><br><span class="line">    <span class="attr">listKind:</span> <span class="string">ApplicationList</span></span><br><span class="line">    <span class="attr">plural:</span> <span class="string">applications</span></span><br><span class="line">    <span class="attr">singular:</span> <span class="string">application</span></span><br><span class="line">  <span class="attr">scope:</span> <span class="string">Namespaced</span></span><br><span class="line">  <span class="attr">versions:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">v1</span></span><br></pre></td></tr></table></figure>
-<ol start="2">
-<li><strong>·config/rbac/role.yaml</strong>：这里面定义的是一个ClusterRole，从名字manager-role上大致可以猜到，这是后面Controller部署后将充当的“角色”。该文件定义了对applications资源的创建、删除、查询、更新等操作。</li>
-</ol>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">rbac.authorization.k8s.io/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">ClusterRole</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">creationTimestamp:</span> <span class="literal">null</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">manager-role</span></span><br><span class="line"><span class="attr">rules:</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">apiGroups:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">apps.danielhu.cn</span></span><br><span class="line">  <span class="attr">resources:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">applications</span></span><br><span class="line">  <span class="attr">verbs:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">create</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">delete</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">get</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">list</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">patch</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">update</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">watch</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">apiGroups:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">apps.danielhu.cn</span></span><br><span class="line">  <span class="attr">resources:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">applications/finalizers</span></span><br><span class="line">  <span class="attr">verbs:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">update</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">apiGroups:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">apps.danielhu.cn</span></span><br><span class="line">  <span class="attr">resources:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">applications/status</span></span><br><span class="line">  <span class="attr">verbs:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">get</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">patch</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">update</span></span><br></pre></td></tr></table></figure>
-<p>通过<code>make install</code>命令来完成CRD的部署过程：</p>
-<p><strong>报错</strong></p>
-<blockquote>
-<p>The connection to the server 192.168.62.128:6443 was refused - did you specify the right host or port?<br />
-make: *** [install] 错误 1</p>
-<p>此时突然发现K8s集群不管用了（个人特异性原因）！解决问题的过程见”集群出问题“文章。</p>
-</blockquote>
-<p>成功后输出以下内容</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@master application-operator]# make install</span><br><span class="line">test -s /root/MyOPeratorProjects/application-operator/bin/controller-gen || GOBIN=/root/MyOPeratorProjects/application-operator/bin go install sigs.k8s.io/controller-tools/cmd/controller-gen@v0.9.2</span><br><span class="line">/root/MyOPeratorProjects/application-operator/bin/controller-gen rbac:roleName=manager-role crd webhook paths=&quot;./...&quot; output:crd:artifacts:config=config/crd/bases</span><br><span class="line">/root/MyOPeratorProjects/application-operator/bin/kustomize build config/crd | kubectl apply -f -                                                     </span><br><span class="line">customresourcedefinition.apiextensions.k8s.io/applications.apps.danielhu.cn created    </span><br></pre></td></tr></table></figure>
-<p>执行完make install后，CRD就部署到集群中了，这时可以通过kubectl查询刚才创建的CRD。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@master application-operator]# kubectl get crd                        </span><br><span class="line">NAME                            CREATED AT                                 </span><br><span class="line">applications.apps.danielhu.cn   2023-04-26T06:31:35Z      </span><br></pre></td></tr></table></figure>
-<p>可以看到，applications.apps.danielhu.cn这个CRD已经存在了。这时就像查询Deployment时可以用kubectl get deployment一样，可以通过kubectl get application来查询刚才自定义的资源。这里的报错信息是没找到资源，而不是“error:the server doesn’t have a resource type&quot;application&quot;”。换言之，此时kube-apiserver已经能识别这种资源了。</p>
-<p><strong>回顾一下，我们依次做的事情：</strong></p>
+<h2 id="-code11-"><a class="markdownIt-Anchor" href="#-code11-"></a> <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">2. **·config/rbac/role.yaml**：这里面定义的是一个ClusterRole，从名字manager-role上大致可以猜到，这是后面Controller部署后将充当的“角色”。该文件定义了对applications资源的创建、删除、查询、更新等操作。</span><br><span class="line"></span><br></pre></td></tr></table></figure></h2>
+<p>apiVersion: <a target="_blank" rel="noopener" href="http://rbac.authorization.k8s.io/v1">rbac.authorization.k8s.io/v1</a><br />
+kind: ClusterRole<br />
+metadata:<br />
+creationTimestamp: null<br />
+name: manager-role<br />
+rules:</p>
 <ul>
-<li>kubebuilder create api --group xxx --version v1 --king Application
+<li>apiGroups:
 <ul>
-<li>这时候在提示下创建了资源和controller</li>
-<li>创建了api文件夹以及变更了main.go等</li>
+<li><a target="_blank" rel="noopener" href="http://apps.danielhu.cn">apps.danielhu.cn</a><br />
+resources:</li>
+<li>applications<br />
+verbs:</li>
+<li>create</li>
+<li>delete</li>
+<li>get</li>
+<li>list</li>
+<li>patch</li>
+<li>update</li>
+<li>watch</li>
 </ul>
 </li>
-<li>api/v1/application_types.go文件中import里加了corev1，metav1，ApplicationSpect中加了replica和template声明副本的数量和模板的配置</li>
-<li>make manifests命令生成CR（config/rbac/role.yaml，Controller部署后将充当的“角色”。）和CRD配置（config/crd/bases/apps.danielhu.cn_applications.yaml）。</li>
-<li>通过make install命令来完成CRD的部署过程。
+<li>apiGroups:
 <ul>
-<li>可以get到crd了，这里crd就像是development</li>
+<li><a target="_blank" rel="noopener" href="http://apps.danielhu.cn">apps.danielhu.cn</a><br />
+resources:</li>
+<li>applications/finalizers<br />
+verbs:</li>
+<li>update</li>
+</ul>
+</li>
+<li>apiGroups:
+<ul>
+<li><a target="_blank" rel="noopener" href="http://apps.danielhu.cn">apps.danielhu.cn</a><br />
+resources:</li>
+<li>applications/status<br />
+verbs:</li>
+<li>get</li>
+<li>patch</li>
+<li>update</li>
 </ul>
 </li>
 </ul>
-<h3 id="5-cr部署"><a class="markdownIt-Anchor" href="#5-cr部署"></a> 5. CR部署</h3>
-<p>和写一个Deployment资源配置对应的×××.yaml一样，创建Application同样需要一个YAML文件。我们在前面提到过在config/samples下有一个apps_v1_application.yaml，其中已经有一些默认配置项了，我们稍微修改一下，加上自定义的属性：</p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">apps.danielhu.cn/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Application</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">application-sample</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">default</span></span><br><span class="line">  <span class="attr">labels:</span></span><br><span class="line">    <span class="attr">app:</span> <span class="string">nginx</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">replicas:</span> <span class="number">3</span></span><br><span class="line">  <span class="attr">template:</span></span><br><span class="line">    <span class="attr">spec:</span></span><br><span class="line">      <span class="attr">containers:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">nginx</span></span><br><span class="line">          <span class="attr">image:</span> <span class="string">nginx:1.14.2</span></span><br><span class="line">          <span class="attr">ports:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="attr">containerPort:</span> <span class="number">80</span></span><br><span class="line">  <span class="comment"># TODO(user): Add fields here</span></span><br></pre></td></tr></table></figure>
-<p>apply一下</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@master application-operator]# kubectl apply -f config/samples/apps_v1</span><br><span class="line">application.apps.danielhu.cn/application-sample cr</span><br></pre></td></tr></table></figure>
-<p>查看刚才创建的application</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@master application-operator]# kubectl get application</span><br><span class="line">NAME                 AGE</span><br><span class="line">application-sample   99s</span><br></pre></td></tr></table></figure>
-<p>一个Application类型的application-sample实例创建出来了，其中包含自定义的所有字段。但是这时并不会有Pod被自动创建出来，因为还没有实现相应的控制器逻辑。</p>
-<h3 id="6-controller实现"><a class="markdownIt-Anchor" href="#6-controller实现"></a> 6. Controller实现</h3>
-<p>现在已经有了CR，该实现Controller逻辑去创建Pod了。在controllers/application_controller.go中的Reconcile()方法内添加如下代码：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(r *ApplicationReconciler)</span></span> Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, <span class="type">error</span>) &#123;</span><br><span class="line">	l := log.FromContext(ctx)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// get the Application</span></span><br><span class="line">	app := &amp;dappsv1.Application&#123;&#125;</span><br><span class="line">	<span class="keyword">if</span> err := r.Get(ctx, req.NamespacedName, app); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">if</span> errors.IsNotFound(err) &#123;</span><br><span class="line">			l.Info(<span class="string">&quot;the Application is not found&quot;</span>)</span><br><span class="line">			<span class="keyword">return</span> ctrl.Result&#123;&#125;, <span class="literal">nil</span></span><br><span class="line">		&#125;</span><br><span class="line">		l.Error(err, <span class="string">&quot;failed to get the Application&quot;</span>)</span><br><span class="line">		<span class="keyword">return</span> ctrl.Result&#123;RequeueAfter: <span class="number">1</span> * time.Minute&#125;, err</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// create pods</span></span><br><span class="line">	<span class="keyword">for</span> i := <span class="number">0</span>; i &lt; <span class="type">int</span>(app.Spec.Replicas); i++ &#123;</span><br><span class="line">		pod := &amp;corev1.Pod&#123;</span><br><span class="line">			ObjectMeta: metav1.ObjectMeta&#123;</span><br><span class="line">				Name:      fmt.Sprintf(<span class="string">&quot;%s-%d&quot;</span>, app.Name, i),</span><br><span class="line">				Namespace: app.Namespace,</span><br><span class="line">				Labels:    app.Labels,</span><br><span class="line">			&#125;,</span><br><span class="line">			Spec: app.Spec.Template.Spec,</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> err := r.Create(ctx, pod); err != <span class="literal">nil</span> &#123;</span><br><span class="line">			l.Error(err, <span class="string">&quot;failed to create Pod&quot;</span>)</span><br><span class="line">			<span class="keyword">return</span> ctrl.Result&#123;RequeueAfter: <span class="number">1</span> * time.Minute&#125;, err</span><br><span class="line">		&#125;</span><br><span class="line">		l.Info(fmt.Sprintf(<span class="string">&quot;the Pod (%s) has created&quot;</span>, pod.Name))</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	l.Info(<span class="string">&quot;all pods has created&quot;</span>)</span><br><span class="line">	<span class="keyword">return</span> ctrl.Result&#123;&#125;, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>import部分</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;context&quot;</span></span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;time&quot;</span></span><br><span class="line"></span><br><span class="line">	corev1 <span class="string">&quot;k8s.io/api/core/v1&quot;</span></span><br><span class="line">	<span class="string">&quot;k8s.io/apimachinery/pkg/api/errors&quot;</span></span><br><span class="line">	metav1 <span class="string">&quot;k8s.io/apimachinery/pkg/apis/meta/v1&quot;</span></span><br><span class="line">	<span class="string">&quot;k8s.io/apimachinery/pkg/runtime&quot;</span></span><br><span class="line">	ctrl <span class="string">&quot;sigs.k8s.io/controller-runtime&quot;</span></span><br><span class="line">	<span class="string">&quot;sigs.k8s.io/controller-runtime/pkg/client&quot;</span></span><br><span class="line">	<span class="string">&quot;sigs.k8s.io/controller-runtime/pkg/log&quot;</span></span><br><span class="line">	</span><br><span class="line">	dappsv1 <span class="string">&quot;github.com/daniel-hutao/application-operator/api/v1&quot;</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
-<p>这里我们把自己的api/v1打包并使用别名dappsv1，<a target="_blank" rel="noopener" href="http://xn--k8s-9s1el2m457i.io/api/apps/v1%E5%8C%85%E4%BA%A7%E7%94%9F%E6%B7%B7%E6%B7%86%E3%80%82">避免和k8s.io/api/apps/v1包产生混淆。</a></p>
-<p>代码解释：</p>
-<p><img src="/images/go_explain.png" alt="go_explain" /></p>
-<p>启动controller：执行make run</p>
-<p><strong>报错</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">通过`make install`命令来完成CRD的部署过程：</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">**报错**</span><br><span class="line"></span><br><span class="line">&gt; The connection to the server 192.168.62.128:6443 was refused - did you specify the right host or port?</span><br><span class="line">&gt;make: *** [install] 错误 1</span><br><span class="line">&gt; </span><br><span class="line">&gt; 此时突然发现K8s集群不管用了（个人特异性原因）！解决问题的过程见”集群出问题“文章。</span><br><span class="line">&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">成功后输出以下内容</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>[root@master application-operator]# make install<br />
+test -s /root/MyOPeratorProjects/application-operator/bin/controller-gen || GOBIN=/root/MyOPeratorProjects/application-operator/bin go install <a target="_blank" rel="noopener" href="http://sigs.k8s.io/controller-tools/cmd/controller-gen@v0.9.2">sigs.k8s.io/controller-tools/cmd/controller-gen@v0.9.2</a><br />
+/root/MyOPeratorProjects/application-operator/bin/controller-gen rbac:roleName=manager-role crd webhook paths=&quot;./…&quot; output:crd:artifacts:config=config/crd/bases<br />
+/root/MyOPeratorProjects/application-operator/bin/kustomize build config/crd | kubectl apply -f -<br />
+<a target="_blank" rel="noopener" href="http://customresourcedefinition.apiextensions.k8s.io/applications.apps.danielhu.cn">customresourcedefinition.apiextensions.k8s.io/applications.apps.danielhu.cn</a> created</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">执行完make install后，CRD就部署到集群中了，这时可以通过kubectl查询刚才创建的CRD。</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>[root@master application-operator]# kubectl get crd<br />
+NAME                            CREATED AT<br />
+<a target="_blank" rel="noopener" href="http://applications.apps.danielhu.cn">applications.apps.danielhu.cn</a>   2023-04-26T06:31:35Z</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">可以看到，applications.apps.danielhu.cn这个CRD已经存在了。这时就像查询Deployment时可以用kubectl get deployment一样，可以通过kubectl get application来查询刚才自定义的资源。这里的报错信息是没找到资源，而不是“error:the server doesn&#x27;t have a resource type&quot;application&quot;”。换言之，此时kube-apiserver已经能识别这种资源了。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">**回顾一下，我们依次做的事情：**</span><br><span class="line"></span><br><span class="line">- kubebuilder create api --group xxx --version v1 --king Application</span><br><span class="line">  - 这时候在提示下创建了资源和controller</span><br><span class="line">  - 创建了api文件夹以及变更了main.go等</span><br><span class="line">- api/v1/application_types.go文件中import里加了corev1，metav1，ApplicationSpect中加了replica和template声明副本的数量和模板的配置</span><br><span class="line">- make manifests命令生成CR（config/rbac/role.yaml，Controller部署后将充当的“角色”。）和CRD配置（config/crd/bases/apps.danielhu.cn_applications.yaml）。</span><br><span class="line">- 通过make install命令来完成CRD的部署过程。</span><br><span class="line">  - 可以get到crd了，这里crd就像是development</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">### 5. CR部署</span><br><span class="line"></span><br><span class="line">和写一个Deployment资源配置对应的×××.yaml一样，创建Application同样需要一个YAML文件。我们在前面提到过在config/samples下有一个apps_v1_application.yaml，其中已经有一些默认配置项了，我们稍微修改一下，加上自定义的属性：</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>apiVersion: <a target="_blank" rel="noopener" href="http://apps.danielhu.cn/v1">apps.danielhu.cn/v1</a><br />
+kind: Application<br />
+metadata:<br />
+name: application-sample<br />
+namespace: default<br />
+labels:<br />
+app: nginx<br />
+spec:<br />
+replicas: 3<br />
+template:<br />
+spec:<br />
+containers:<br />
+- name: nginx<br />
+image: nginx:1.14.2<br />
+ports:<br />
+- containerPort: 80</p>
+<h1 id="todouser-add-fields-here"><a class="markdownIt-Anchor" href="#todouser-add-fields-here"></a> TODO(user): Add fields here</h1>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">apply一下</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>[root@master application-operator]# kubectl apply -f config/samples/apps_v1<br />
+<a target="_blank" rel="noopener" href="http://application.apps.danielhu.cn/application-sample">application.apps.danielhu.cn/application-sample</a> cr</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">查看刚才创建的application</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>[root@master application-operator]# kubectl get application<br />
+NAME                 AGE<br />
+application-sample   99s</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">一个Application类型的application-sample实例创建出来了，其中包含自定义的所有字段。但是这时并不会有Pod被自动创建出来，因为还没有实现相应的控制器逻辑。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">### 6. Controller实现</span><br><span class="line"></span><br><span class="line">现在已经有了CR，该实现Controller逻辑去创建Pod了。在controllers/application_controller.go中的Reconcile()方法内添加如下代码：</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>func (r *ApplicationReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {<br />
+l := log.FromContext(ctx)</p>
+<pre><code>// get the Application
+app := &amp;dappsv1.Application&#123;&#125;
+if err := r.Get(ctx, req.NamespacedName, app); err != nil &#123;
+	if errors.IsNotFound(err) &#123;
+		l.Info(&quot;the Application is not found&quot;)
+		return ctrl.Result&#123;&#125;, nil
+	&#125;
+	l.Error(err, &quot;failed to get the Application&quot;)
+	return ctrl.Result&#123;RequeueAfter: 1 * time.Minute&#125;, err
+&#125;
+
+// create pods
+for i := 0; i &lt; int(app.Spec.Replicas); i++ &#123;
+	pod := &amp;corev1.Pod&#123;
+		ObjectMeta: metav1.ObjectMeta&#123;
+			Name:      fmt.Sprintf(&quot;%s-%d&quot;, app.Name, i),
+			Namespace: app.Namespace,
+			Labels:    app.Labels,
+		&#125;,
+		Spec: app.Spec.Template.Spec,
+	&#125;
+
+	if err := r.Create(ctx, pod); err != nil &#123;
+		l.Error(err, &quot;failed to create Pod&quot;)
+		return ctrl.Result&#123;RequeueAfter: 1 * time.Minute&#125;, err
+	&#125;
+	l.Info(fmt.Sprintf(&quot;the Pod (%s) has created&quot;, pod.Name))
+&#125;
+
+l.Info(&quot;all pods has created&quot;)
+return ctrl.Result&#123;&#125;, nil
+</code></pre>
+<p>}</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">import部分</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>import (<br />
+“context”<br />
+“fmt”<br />
+“time”</p>
+<pre><code>corev1 &quot;k8s.io/api/core/v1&quot;
+&quot;k8s.io/apimachinery/pkg/api/errors&quot;
+metav1 &quot;k8s.io/apimachinery/pkg/apis/meta/v1&quot;
+&quot;k8s.io/apimachinery/pkg/runtime&quot;
+ctrl &quot;sigs.k8s.io/controller-runtime&quot;
+&quot;sigs.k8s.io/controller-runtime/pkg/client&quot;
+&quot;sigs.k8s.io/controller-runtime/pkg/log&quot;
+
+dappsv1 &quot;github.com/daniel-hutao/application-operator/api/v1&quot;
+</code></pre>
+<p>)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">这里我们把自己的api/v1打包并使用别名dappsv1，避免和k8s.io/api/apps/v1包产生混淆。</span><br><span class="line"></span><br><span class="line">代码解释：</span><br><span class="line"></span><br><span class="line">![go_explain](/images/go_explain.png)</span><br><span class="line"></span><br><span class="line">启动controller：执行make run</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">**报错**</span><br><span class="line"></span><br><span class="line">&gt; 此时不出意外的又出问题了，输出一段数据后页面停止不动了，这时候ctrl+c退出，显示</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
 <blockquote>
-<p>此时不出意外的又出问题了，输出一段数据后页面停止不动了，这时候ctrl+c退出，显示</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1.682495037273707e+09   INFO    All workers finished    &#123;&quot;controller&quot;: &quot;application&quot;, &quot;controllerGroup&quot;: &quot;apps.danielhu.cn&quot;, &quot;controllerKind&quot;: &quot;Application&quot;&#125;</span><br><span class="line">1.6824950372737312e+09  INFO    Stopping and waiting for caches</span><br><span class="line">1.6824950372738228e+09  INFO    Stopping and waiting for webhooks</span><br><span class="line">1.6824950372738297e+09  INFO    Wait completed, proceeding to shutdown the manager</span><br><span class="line">make: *** [run] 错误 1</span><br></pre></td></tr></table></figure>
-<p>不知道为啥，查看pod信息，发现三个pod都在pending</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">root@master application-operator]# kubectl get pod</span><br><span class="line">NAME                   READY   STATUS    RESTARTS   AGE</span><br><span class="line">application-sample-0   0/1     Pending   0          7m44s</span><br><span class="line">application-sample-1   0/1     Pending   0          7m44s</span><br><span class="line">application-sample-2   0/1     Pending   0          7m44s</span><br></pre></td></tr></table></figure>
-<p>这时候肯定是describe pod，输出最后的信息如下</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Events:</span><br><span class="line">  Type     Reason            Age                  From               Message</span><br><span class="line">  ----     ------            ----                 ----               -------</span><br><span class="line">  Warning  FailedScheduling  65s (x6 over 8m33s)  default-scheduler  0/3 nodes are available: 3 node(s) had taints that the pod didn&#x27;t tolerate.</span><br></pre></td></tr></table></figure>
-<p>说三个节点都有污点，master肯定是有污点的，另外两个怎么回事？查看node，发现</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@master application-operator]# kubectl get nodes</span><br><span class="line">NAME     STATUS     ROLES    AGE     VERSION</span><br><span class="line">master   Ready      master   5d16h   v1.17.4</span><br><span class="line">node1    NotReady   &lt;none&gt;   5d15h   v1.17.4</span><br><span class="line">node2    NotReady   &lt;none&gt;   5d15h   v1.17.4</span><br></pre></td></tr></table></figure>
-<p>两个节点竟然没跑起来？describe node1发现提示NetworkUnavailable</p>
-<p>ping Node1发现不可达</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@master application-operator]# ping node1</span><br><span class="line">PING node1 (192.168.62.134) 56(84) bytes of data.</span><br><span class="line">From master (192.168.62.128) icmp_seq=10 Destination Host Unreachable</span><br></pre></td></tr></table></figure>
-<p>不知道为啥网断了node1失去了ip地址，我进入node1重启网路服务，网络好了。</p>
+<p>1.682495037273707e+09   INFO    All workers finished    {“controller”: “application”, “controllerGroup”: “<a target="_blank" rel="noopener" href="http://apps.danielhu.cn">apps.danielhu.cn</a>”, “controllerKind”: “Application”}<br />
+1.6824950372737312e+09  INFO    Stopping and waiting for caches<br />
+1.6824950372738228e+09  INFO    Stopping and waiting for webhooks<br />
+1.6824950372738297e+09  INFO    Wait completed, proceeding to shutdown the manager<br />
+make: *** [run] 错误 1</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">不知道为啥，查看pod信息，发现三个pod都在pending</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>root@master application-operator]# kubectl get pod<br />
+NAME                   READY   STATUS    RESTARTS   AGE<br />
+application-sample-0   0/1     Pending   0          7m44s<br />
+application-sample-1   0/1     Pending   0          7m44s<br />
+application-sample-2   0/1     Pending   0          7m44s</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">这时候肯定是describe pod，输出最后的信息如下</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>Events:<br />
+Type     Reason            Age                  From               Message</p>
+<hr />
+<p>Warning  FailedScheduling  65s (x6 over 8m33s)  default-scheduler  0/3 nodes are available: 3 node(s) had taints that the pod didn’t tolerate.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">说三个节点都有污点，master肯定是有污点的，另外两个怎么回事？查看node，发现</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>[root@master application-operator]# kubectl get nodes<br />
+NAME     STATUS     ROLES    AGE     VERSION<br />
+master   Ready      master   5d16h   v1.17.4<br />
+node1    NotReady   <none>   5d15h   v1.17.4<br />
+node2    NotReady   <none>   5d15h   v1.17.4</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">两个节点竟然没跑起来？describe node1发现提示NetworkUnavailable</span><br><span class="line"></span><br><span class="line">ping Node1发现不可达</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>[root@master application-operator]# ping node1<br />
+PING node1 (192.168.62.134) 56(84) bytes of data.<br />
+From master (192.168.62.128) icmp_seq=10 Destination Host Unreachable</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">不知道为啥网断了node1失去了ip地址，我进入node1重启网路服务，网络好了。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">**报错：**</span><br><span class="line"></span><br><span class="line">1.6824959595997632e+09  ERROR   setup   unable to start manager &#123;&quot;error&quot;: &quot;error listening on :8080: listen tcp :8080: bind: address already in use&quot;&#125;</span><br><span class="line"></span><br><span class="line">因为这个端口已经被我创建出来的pod占了，不用再创建新的了。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">此时kubectl get pods可以查出三个之前部署的pod已经在运行了。</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 </blockquote>
-<p><strong>报错：</strong></p>
-<blockquote>
-<p>1.6824959595997632e+09  ERROR   setup   unable to start manager {“error”: “error listening on :8080: listen tcp :8080: bind: address already in use”}</p>
-<p>因为这个端口已经被我创建出来的pod占了，不用再创建新的了。</p>
-</blockquote>
-<p>此时kubectl get pods可以查出三个之前部署的pod已经在运行了。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@master ~]# kubectl get pods</span><br><span class="line">NAME                   READY   STATUS    RESTARTS   AGE</span><br><span class="line">application-sample-0   1/1     Running   0          22h</span><br><span class="line">application-sample-1   1/1     Running   0          22h</span><br><span class="line">application-sample-2   1/1     Running   0          22h</span><br></pre></td></tr></table></figure>
-<h3 id="7-controller部署"><a class="markdownIt-Anchor" href="#7-controller部署"></a> 7. Controller部署</h3>
-<p>前面我们部署了一个Application类型的资源对象实例，也运行Controller看到了相应副本数的Pod被创建出来。现在我们进一步模拟Operator实际使用时的部署方式，把Controller打包后用容器化方式部署到Kubernetes集群环境中：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">make docker-build IMG=application-operator:v0.0.1</span><br><span class="line">kind load docker-image application-operator:v0.0.1 --name dev    no</span><br><span class="line">make deploy IMG=application-operator:v0.0.1 </span><br></pre></td></tr></table></figure>
-<p>因为我的K8s不是使用kind，所以省掉了第二步，最终查到了部署的Pod</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@master application-operator]# kubectl get pod -n application-operator-system</span><br><span class="line">NAME                                                       READY   STATUS         RESTARTS   AGE</span><br><span class="line">application-operator-controller-manager-5b754fc8bd-z28z9   1/2     ErrImagePull   0          2m46s</span><br></pre></td></tr></table></figure>
-<p>至此，就实现了一个非常简单的Operator程序的开发、编译构建、打包、部署等流程。当然，如果前面执行make run启动了控制器创建出来的3个Pod没有被删除，这时再次部署一个Operator控制器，日志里肯定会有报错信息的，因为我们没有实现Pod存在校验等代码逻辑。不过这不是重点，有没有这些错误，我们的Demo程序都算走完了。到这里，大家基本体验了一遍Operator的快速开发流程。</p>
-<h3 id="8-资源清理"><a class="markdownIt-Anchor" href="#8-资源清理"></a> 8. 资源清理</h3>
-<p>前面我们通过几个步骤分别部署了CRD、CR和Controller，这时环境中新增的资源不少（各种rbac相关的、部署相关的资源），如果这些资源都用kubectl一个一个来清理，还是很痛苦的。同样，清理的步骤也可以通过Makefile来实现：</p>
-<p>卸载Controller：<code>make undeploy</code></p>
-<p>卸载CRD：<code>make uninstall</code></p>
-<h3 id="9总结与理解"><a class="markdownIt-Anchor" href="#9总结与理解"></a> 9.总结与理解</h3>
-<p><img src="/images/summarize_helloworld.png" alt="" /></p>
-<h3 id="10-受锤感悟"><a class="markdownIt-Anchor" href="#10-受锤感悟"></a> 10. 受锤感悟</h3>
-<p>在做的过程中一次次的遇到各种问题，环境、网络、版本匹配、敲错命令找半天、k8s莫名升级到最新版本、教程有误…各种错误，无一不让我心头焦灼攥紧拳头火冒三丈，心灰意冷。</p>
-<p>不断遇到问题，不断解决问题，这个过程很痛苦，但是问题解决的那一刻很有成就感。</p>
-<p>相信只要不放弃，在被各种“问题”洗礼的过程中，我们的能力会越来越强。</p>
-<blockquote>
-<p>Notes：</p>
-<p>以上内容均为个人学习过程中的理解，理解和总结可能有偏差。文章内容会随着学习过程不断修改完善。</p>
-<p>如果以上有错误欢迎指出。</p>
-<p>本次实验案例来自 胡涛 <a target="_blank" rel="noopener" href="https://www.danielhu.cn/categories/">https://www.danielhu.cn/categories/</a></p>
-</blockquote>
+<p>[root@master ~]# kubectl get pods<br />
+NAME                   READY   STATUS    RESTARTS   AGE<br />
+application-sample-0   1/1     Running   0          22h<br />
+application-sample-1   1/1     Running   0          22h<br />
+application-sample-2   1/1     Running   0          22h</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">### 7. Controller部署</span><br><span class="line"></span><br><span class="line">前面我们部署了一个Application类型的资源对象实例，也运行Controller看到了相应副本数的Pod被创建出来。现在我们进一步模拟Operator实际使用时的部署方式，把Controller打包后用容器化方式部署到Kubernetes集群环境中：</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>make docker-build IMG=application-operator:v0.0.1<br />
+kind load docker-image application-operator:v0.0.1 --name dev    no<br />
+make deploy IMG=application-operator:v0.0.1</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">因为我的K8s不是使用kind，所以省掉了第二步，最终查到了部署的Pod</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>[root@master application-operator]# kubectl get pod -n application-operator-system<br />
+NAME                                                       READY   STATUS         RESTARTS   AGE<br />
+application-operator-controller-manager-5b754fc8bd-z28z9   1/2     ErrImagePull   0          2m46s</p>
+<pre class="highlight"><code class="">
+至此，就实现了一个非常简单的Operator程序的开发、编译构建、打包、部署等流程。当然，如果前面执行make run启动了控制器创建出来的3个Pod没有被删除，这时再次部署一个Operator控制器，日志里肯定会有报错信息的，因为我们没有实现Pod存在校验等代码逻辑。不过这不是重点，有没有这些错误，我们的Demo程序都算走完了。到这里，大家基本体验了一遍Operator的快速开发流程。
+
+
+
+### 8. 资源清理
+
+前面我们通过几个步骤分别部署了CRD、CR和Controller，这时环境中新增的资源不少（各种rbac相关的、部署相关的资源），如果这些资源都用kubectl一个一个来清理，还是很痛苦的。同样，清理的步骤也可以通过Makefile来实现：
+
+卸载Controller：`make undeploy`
+
+卸载CRD：`make uninstall`
+
+
+
+### 9.总结与理解
+
+![](/images/summarize_helloworld.png)
+
+
+
+### 10. 受锤感悟
+
+在做的过程中一次次的遇到各种问题，环境、网络、版本匹配、敲错命令找半天、k8s莫名升级到最新版本、教程有误......各种错误，无一不让我心头焦灼攥紧拳头火冒三丈，心灰意冷。
+
+不断遇到问题，不断解决问题，这个过程很痛苦，但是问题解决的那一刻很有成就感。
+
+相信只要不放弃，在被各种“问题”洗礼的过程中，我们的能力会越来越强。
+
+
+
+
+
+&gt; Notes：
+&gt;
+&gt; 以上内容均为个人学习过程中的理解，理解和总结可能有偏差。文章内容会随着学习过程不断修改完善。
+&gt;
+&gt; 如果以上有错误欢迎指出。
+&gt;
+&gt; 本次实验案例来自 胡涛 https://www.danielhu.cn/categories/
+
+</code></pre>
 
 </div>
 
