@@ -8,6 +8,8 @@
 	<!-- title -->
 	
 	<title>
+	
+		GVK和GVR | 
 	 
 	Hexo
 	</title>
@@ -256,7 +258,7 @@
 							</ul>
 			
 							<ul>
-								<li class="file">
+								<li class="file active">
 									<a href="/2023/04/28/9.%20GVK-%E7%BB%84%E3%80%81%E7%89%88%E6%9C%AC%E5%92%8C%E7%B1%BB%E5%9E%8B/">
                      
 										    GVK和GVR
@@ -272,103 +274,103 @@
 
 	<!-- 引入正文 -->
 	<div id="content">
-		<div id="index">
-	
-		<div class="index-li">
-			<a href="/2023/04/24/3.%20K8s%E6%9C%8D%E5%8A%A1%E6%9A%B4%E9%9C%B2/">
-				<h2 class="index-title">
-					K8s服务暴露
-				</h2>
-				<div class="index-brief">
-					 1. Service
-服务暴露就是指把运行在K8s集群中的软件提供的服务（功能）拿出来，在前端发出请求时做出相应的响应。比如我们通常开发的bs应用前端的浏览器页面发出get请求到后端，后端接收到请求后就会计算分析，得到结果，并返回给前端一个html页面。然而在K8s中，应用程序被“层层包裹”，放在
-					...
-				</div>
-			</a>
-                <div class="article-meta">
-				    <span>2023-04-24</span>
-                    
-                            
-                                
-                                    <span>
-                                        <i class="fa fa-folder" aria-hidden="true"></i>
-                                        <a href="/categories/Kubernetes学习笔记/">Kubernetes学习笔记</a>
-										
-                                    </span>
-                                
-                            
-                    
-                </div>
-		</div>	
-	
-		<div class="index-li">
-			<a href="/2023/04/23/2.%20Pod%E7%BB%86%E8%8A%82%E5%88%86%E6%9E%90/">
-				<h2 class="index-title">
-					Pod细节分析
-				</h2>
-				<div class="index-brief">
-					
-操作K8s的两种方式
-我们日常操作K8s资源的方式可以分为两类，一类是直接编写一语句写清当前要执行的工作，比如
-kubectl run nginx-pod --image=nginx:1.17.1
-通过这样简单的一条语句就可以创建一个Pod，其镜像为nginx:1.17.1，如果本地机器没有这个镜
-					...
-				</div>
-			</a>
-                <div class="article-meta">
-				    <span>2023-04-23</span>
-                    
-                            
-                                
-                                    <span>
-                                        <i class="fa fa-folder" aria-hidden="true"></i>
-                                        <a href="/categories/Kubernetes学习笔记/">Kubernetes学习笔记</a>
-										
-                                    </span>
-                                
-                            
-                    
-                </div>
-		</div>	
-	
-		<div class="index-li">
-			<a href="/2023/04/23/1.%20Kubernetes%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/">
-				<h2 class="index-title">
-					Kubernetes基本结构
-				</h2>
-				<div class="index-brief">
-					 1 基本组成
-首先，一个基本的Kubernetes集群由若干个Master节点和若干个Node节点组成。Master相当于集群的大脑，做集群的规划和控制，核心的控制组件都会部署到Mater节点上。Node节点是实际运行程序的工作节点。
+		<h1 id="article-title">
+	GVK和GVR
+</h1>
 
-q: 大脑一个不就够了吗？
-如果一个集群只有一个Master
-					...
-				</div>
-			</a>
-                <div class="article-meta">
-				    <span>2023-04-23</span>
-                    
-                            
-                                
-                                    <span>
-                                        <i class="fa fa-folder" aria-hidden="true"></i>
-                                        <a href="/categories/Kubernetes学习笔记/">Kubernetes学习笔记</a>
-										
-                                    </span>
-                                
-                            
-                    
-                </div>
-		</div>	
+<!-- meta -->
+<div class="article-meta">
 	
-	
-	<div id="index-paginator">
-		
-			<a class="extend prev" rel="prev" href="/categories/Kubernetes%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">&lt;</a><a class="page-number" href="/categories/Kubernetes%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">1</a><span class="page-number current">2</span>
-		
-	</div>
+
+	<span>John Doe</span>
+	<span>2023-04-28 11:17:25</span>
+
+  <div id="article-categories">
+    
+		  <span>Categories：</span>
+      
+          
+              <span>
+                  <i class="fa fa-folder" aria-hidden="true">
+                  <a href="/categories/Kubernetes学习笔记/">Kubernetes学习笔记</a>
+                  </i>
+                
+              </span>
+          
+      
+    
+
+    
+		    <span>Tags：</span>
+        
+    
+  </div>
+
 </div>
 
+<!-- content -->
+<div id="article-content">
+	<h3 id="gvk和gvr"><a class="markdownIt-Anchor" href="#gvk和gvr"></a> GVK和GVR</h3>
+<p>GVK就是Group、Version、Kind三个词的首字母缩写。</p>
+<p>我们在描述Kubernetes API时经常会用到这样一个四元组：Groups、Versions、Kinds和Resources。它们具体是什么含义呢？</p>
+<ul>
+<li>Groups和Versions：
+<ul>
+<li>一个Kubernetes API Group表示的是一些相关功能的集合，比如 <strong>apps</strong> 这个Group里面就包含deployments、replicasets、daemonsets、statefulsets等资源，这些资源都是应用工作负载相关的，也就放在了同一个Group下。</li>
+<li>一个Group可以有一个或多个 <strong>Versions</strong> ，不难理解这里的用意，毕竟随着时间的推移，一个Group中的API难免有所变化。</li>
+</ul>
+</li>
+<li>Kinds和Resources：
+<ul>
+<li><strong>每个group-version（确定版本的一个组）中都包含一个或多个API类型，这些类型就是这里说的Kinds。</strong></li>
+<li>每个Kind在不同的版本中一般会有所差异，但是每个版本的Kind要能够存储其他版本Kind的资源类型，无论是通过存储在字段里实现还是通过存储在注解中实现，具体的机制后面会详细讲解。这也就意味着使用老版本的API存储新版本类型数据不会引起数据丢失或污染。</li>
+<li><strong>Resources指的是一个Kind的具体使用</strong>，比如Pod类型对应的资源是pods。例如我们可以创建5个pods资源，其类型是Pod。</li>
+<li><strong>描述资源的单词都是小写的，就像pods，而对应的类型一般就是这个资源的首字母大写单词的单数形式</strong>，比如pods对应Pod。</li>
+<li>类型和资源往往是一一对应的，尤其是在CRD的实现上。<code>（常见的特例就是为了支持HorizontalPodAutoscaler（HPA）和不同类型交互，Scale类型对应的资源有deployments/scale和replicasets/scale两两种。）</code></li>
+</ul>
+</li>
+</ul>
+<p>于是我们知道了<strong>可以通过一个GroupVersionKind（GVK）确定一个具体的类型，同样确定一个资源也就可以通过GroupVersionResource（GVR）来实现</strong>。</p>
+<blockquote>
+<p>Notes：</p>
+<p>以上内容均为个人学习过程中的理解，理解和总结可能有偏差。文章内容会随着学习过程不断修改完善。</p>
+<p>如果以上有错误欢迎指出。</p>
+</blockquote>
+
+</div>
+
+<!-- post-guide -->
+
+    <div class="post-guide">
+        <div class="item left">
+            
+              <a href="/2023/04/28/10.%20%E6%B7%B1%E5%85%A5%E5%AD%A6%E4%B9%A0Client-go%E5%AE%9E%E7%8E%B0%E6%9C%BA%E7%90%86/">
+                  <i class="fa fa-angle-left" aria-hidden="true"></i>
+                  深入学习Client-Go实现机理（进行中）
+              </a>
+            
+        </div>
+        <div class="item right">
+            
+              <a href="/2023/04/27/7.5.%20%E3%80%90%E6%95%85%E9%9A%9C%E3%80%91%E4%B8%80%E5%8F%B0%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%99%BB%E9%99%86%E4%B8%8D%E8%BF%9B%E5%8E%BB%E4%BA%86/">
+                【故障】一台虚拟机登陆不进去了
+                <i class="fa fa-angle-right" aria-hidden="true"></i>
+              </a>
+            
+        </div>
+    </div>
+
+
+<!-- comment - giscus -->
+
+
+<!-- comment - valine -->
+
+
+<script>
+	
+	
+</script>
 	</div>
 	<div id="footer">
 	<p>

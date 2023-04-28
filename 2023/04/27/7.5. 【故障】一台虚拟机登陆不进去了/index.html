@@ -8,6 +8,8 @@
 	<!-- title -->
 	
 	<title>
+	
+		【故障】一台虚拟机登陆不进去了 | 
 	 
 	Hexo
 	</title>
@@ -234,7 +236,7 @@
 							</ul>
 			
 							<ul>
-								<li class="file">
+								<li class="file active">
 									<a href="/2023/04/27/7.5.%20%E3%80%90%E6%95%85%E9%9A%9C%E3%80%91%E4%B8%80%E5%8F%B0%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%99%BB%E9%99%86%E4%B8%8D%E8%BF%9B%E5%8E%BB%E4%BA%86/">
                      
 										    【故障】一台虚拟机登陆不进去了
@@ -272,103 +274,101 @@
 
 	<!-- 引入正文 -->
 	<div id="content">
-		<div id="index">
-	
-		<div class="index-li">
-			<a href="/2023/04/24/3.%20K8s%E6%9C%8D%E5%8A%A1%E6%9A%B4%E9%9C%B2/">
-				<h2 class="index-title">
-					K8s服务暴露
-				</h2>
-				<div class="index-brief">
-					 1. Service
-服务暴露就是指把运行在K8s集群中的软件提供的服务（功能）拿出来，在前端发出请求时做出相应的响应。比如我们通常开发的bs应用前端的浏览器页面发出get请求到后端，后端接收到请求后就会计算分析，得到结果，并返回给前端一个html页面。然而在K8s中，应用程序被“层层包裹”，放在
-					...
-				</div>
-			</a>
-                <div class="article-meta">
-				    <span>2023-04-24</span>
-                    
-                            
-                                
-                                    <span>
-                                        <i class="fa fa-folder" aria-hidden="true"></i>
-                                        <a href="/categories/Kubernetes学习笔记/">Kubernetes学习笔记</a>
-										
-                                    </span>
-                                
-                            
-                    
-                </div>
-		</div>	
-	
-		<div class="index-li">
-			<a href="/2023/04/23/2.%20Pod%E7%BB%86%E8%8A%82%E5%88%86%E6%9E%90/">
-				<h2 class="index-title">
-					Pod细节分析
-				</h2>
-				<div class="index-brief">
-					
-操作K8s的两种方式
-我们日常操作K8s资源的方式可以分为两类，一类是直接编写一语句写清当前要执行的工作，比如
-kubectl run nginx-pod --image=nginx:1.17.1
-通过这样简单的一条语句就可以创建一个Pod，其镜像为nginx:1.17.1，如果本地机器没有这个镜
-					...
-				</div>
-			</a>
-                <div class="article-meta">
-				    <span>2023-04-23</span>
-                    
-                            
-                                
-                                    <span>
-                                        <i class="fa fa-folder" aria-hidden="true"></i>
-                                        <a href="/categories/Kubernetes学习笔记/">Kubernetes学习笔记</a>
-										
-                                    </span>
-                                
-                            
-                    
-                </div>
-		</div>	
-	
-		<div class="index-li">
-			<a href="/2023/04/23/1.%20Kubernetes%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/">
-				<h2 class="index-title">
-					Kubernetes基本结构
-				</h2>
-				<div class="index-brief">
-					 1 基本组成
-首先，一个基本的Kubernetes集群由若干个Master节点和若干个Node节点组成。Master相当于集群的大脑，做集群的规划和控制，核心的控制组件都会部署到Mater节点上。Node节点是实际运行程序的工作节点。
+		<h1 id="article-title">
+	【故障】一台虚拟机登陆不进去了
+</h1>
 
-q: 大脑一个不就够了吗？
-如果一个集群只有一个Master
-					...
-				</div>
-			</a>
-                <div class="article-meta">
-				    <span>2023-04-23</span>
-                    
-                            
-                                
-                                    <span>
-                                        <i class="fa fa-folder" aria-hidden="true"></i>
-                                        <a href="/categories/Kubernetes学习笔记/">Kubernetes学习笔记</a>
-										
-                                    </span>
-                                
-                            
-                    
-                </div>
-		</div>	
+<!-- meta -->
+<div class="article-meta">
 	
-	
-	<div id="index-paginator">
-		
-			<a class="extend prev" rel="prev" href="/categories/Kubernetes%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">&lt;</a><a class="page-number" href="/categories/Kubernetes%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">1</a><span class="page-number current">2</span>
-		
-	</div>
+
+	<span>John Doe</span>
+	<span>2023-04-27 23:59:31</span>
+
+  <div id="article-categories">
+    
+		  <span>Categories：</span>
+      
+          
+              <span>
+                  <i class="fa fa-folder" aria-hidden="true">
+                  <a href="/categories/Kubernetes学习笔记/">Kubernetes学习笔记</a>
+                  </i>
+                
+              </span>
+          
+      
+    
+
+    
+		    <span>Tags：</span>
+        
+    
+  </div>
+
 </div>
 
+<!-- content -->
+<div id="article-content">
+	<p>果然是每天必出现bug。</p>
+<p>今天好端端的打开master虚拟机，结果输入账号密码后黑屏，等待一会再出现登陆页面，再次输入账号密码，再次黑屏，再次出现登录页面。。。。。</p>
+<p>好家伙，你搁这逗我玩呢？</p>
+<p>打开命令行，输入账号密码，看到系统直接刷屏”command not found“”■■■■■■“，一直刷一直刷，输入命令也不管用。</p>
+<p>鉴于上次GPT的良好表现，直接开始咨询GPT。</p>
+<p>GPT说可能的问题有很多，但是其中一条”可能是系统的环境变量出现错误“，吸引了我的注意力，上次确实修改了环境变量。然后问了很多关于”单用户登录“，”配置文件出错“的问题。</p>
+<p>GPT建议开机进入”单用户模式“，修改相应的配置文件，问怎么进入单用户，他说开机的时候按esc，我按半天进入了一个页面，但是没显示哪个能进入单用户，看了半天看不出来。</p>
+<p>于是上网搜，发现根本不是这样进入单用户的，GPT这次出现了小失误。</p>
+<p>按照网上的方法开机选系统的时候按e，然后编辑ro变为rw，并在有ro那一行最后加上init=/bin/sh 然后ctrl+x即可</p>
+<p>进入成功，查看配置文件<strong>etc/profile</strong>，发现确实不太对劲，我配置的go路径怎么跑最上边去了？</p>
+<p>网上查最初始profile的样子，显然上面那一行是多余的，于是按照网上的删掉多余的，保存，重新开机。</p>
+<p>解决。</p>
+<p>解决后打开系统，看到当时编辑的配置文件就出现在桌面上呈打开的状态。所以这个文件出现问题的原因我觉得有两种可能：</p>
+<ul>
+<li>编辑后没关闭直接点的外部VMWare的关闭虚拟机按钮，相当于直接给这个虚拟的计算机断电了，可能文件打开状态下直接强行关机导致的文件读写错误。</li>
+<li>编辑后没关闭，关掉电脑屏幕后身体蹭到了键盘，导致对文件不知不觉又进行了操作（几乎没可能，因为我需要按到了很多巧合的按键最后还保存了才会这样）。</li>
+</ul>
+<p>如果是第一种可能，我只想说做linux系统的人把它做的真不好，鲁棒性不强。为什么把系统做的这么脆弱？这样的产品做出来真是给我们程序员群体丢脸！</p>
+<p>**23点发现问题，24点解决。小小问题费了我一个小时！**😟</p>
+<blockquote>
+<p>Notes：</p>
+<p>以上内容均为个人学习过程中的理解，理解和总结可能有偏差。文章内容会随着学习过程不断修改完善。</p>
+<p>如果以上有错误欢迎指出。</p>
+</blockquote>
+
+</div>
+
+<!-- post-guide -->
+
+    <div class="post-guide">
+        <div class="item left">
+            
+              <a href="/2023/04/28/9.%20GVK-%E7%BB%84%E3%80%81%E7%89%88%E6%9C%AC%E5%92%8C%E7%B1%BB%E5%9E%8B/">
+                  <i class="fa fa-angle-left" aria-hidden="true"></i>
+                  GVK和GVR
+              </a>
+            
+        </div>
+        <div class="item right">
+            
+              <a href="/2023/04/27/11.%20Operator%E5%BC%80%E5%8F%91%E8%BF%9B%E9%98%B6/">
+                Operator开发进阶（进行中）
+                <i class="fa fa-angle-right" aria-hidden="true"></i>
+              </a>
+            
+        </div>
+    </div>
+
+
+<!-- comment - giscus -->
+
+
+<!-- comment - valine -->
+
+
+<script>
+	
+	
+</script>
 	</div>
 	<div id="footer">
 	<p>
