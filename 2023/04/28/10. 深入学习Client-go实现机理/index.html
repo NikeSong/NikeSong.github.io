@@ -9,7 +9,7 @@
 	
 	<title>
 	
-		Kubernetes基本结构 | 
+		深入学习Client-Go实现机理 | 
 	 
 	Hexo
 	</title>
@@ -126,7 +126,7 @@
 
 			
 							<ul>
-								<li class="file active">
+								<li class="file">
 									<a href="/2023/04/23/1.%20Kubernetes%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/">
                      
 										    Kubernetes基本结构
@@ -137,7 +137,7 @@
 							</ul>
 			
 							<ul>
-								<li class="file">
+								<li class="file active">
 									<a href="/2023/04/28/10.%20%E6%B7%B1%E5%85%A5%E5%AD%A6%E4%B9%A0Client-go%E5%AE%9E%E7%8E%B0%E6%9C%BA%E7%90%86/">
                      
 										    深入学习Client-Go实现机理
@@ -275,7 +275,7 @@
 	<!-- 引入正文 -->
 	<div id="content">
 		<h1 id="article-title">
-	Kubernetes基本结构
+	深入学习Client-Go实现机理
 </h1>
 
 <!-- meta -->
@@ -283,7 +283,7 @@
 	
 
 	<span>John Doe</span>
-	<span>2023-04-23 10:15:03</span>
+	<span>2023-04-28 11:46:16</span>
 
   <div id="article-categories">
     
@@ -310,49 +310,27 @@
 
 <!-- content -->
 <div id="article-content">
-	<h2 id="1-基本组成"><a class="markdownIt-Anchor" href="#1-基本组成"></a> 1 基本组成</h2>
-<p>首先，一个基本的Kubernetes集群由若干个Master节点和若干个Node节点组成。Master相当于集群的大脑，做集群的规划和控制，核心的控制组件都会部署到Mater节点上。Node节点是实际运行程序的工作节点。</p>
-<blockquote>
-<p>q: 大脑一个不就够了吗？</p>
-<p>如果一个集群只有一个Master，那么如果这个Master故障后整个集群的工作都会不正常，是不合理的。一般Master节点数目设置为大于1的单数。</p>
-<p>q: 为什么是单数？</p>
-<p>因为在执行类似于投票的工作时双数会出现平票，单数避免了这样的问题。</p>
-</blockquote>
-<p><img src="../images/s1.png" alt="s1" /></p>
-<h2 id="2-结构拆解"><a class="markdownIt-Anchor" href="#2-结构拆解"></a> 2 结构拆解</h2>
-<h3 id="21-结构分析"><a class="markdownIt-Anchor" href="#21-结构分析"></a> 2.1 结构分析</h3>
-<p><img src="../images/s2.png" alt="s2" /></p>
-<p><strong>首先从Node节点看起。</strong></p>
-<p><img src="../images/s_node.png" alt="s_node" /></p>
+	<p>使用Kubebuilder已经屏蔽了不少client-go的细节，但是要深入Operator开发机制，还是需要对client-go有一定的理解。在GitHub（<a href="https://github.com/kubernetes/client-go%EF%BC%89%E4%B8%8A%E5%8F%AF%E4%BB%A5%E6%89%BE%E5%88%B0client-go%E7%9A%84%E6%BA%90%E7%A0%81">https://github.com/kubernetes/client-go）上可以找到client-go的源码</a></p>
+<h3 id="1-client-go的包结构"><a class="markdownIt-Anchor" href="#1-client-go的包结构"></a> 1. client-go的包结构</h3>
 <ul>
-<li>Node方块中的最小单位是Pod，Pod直译为豆荚，是K8s控制和调度的最小单位，也是一切工作的关注核心。理解为豆荚是非常直观的，因为这里面运行了一个个的容器，每个容器可以理解为一个豆子。容器中运行着我们部署的程序。看我下面画的是不是挺像豌豆 😃</li>
+<li>kubernetes：这个包中放的是用client-gen自动生成的用来访问Kubernetes API的ClientSet，后面会经常看到ClientSet这个工具。</li>
+<li>discovery：这个包提供了一种机制用来发现API Server支持的API资源。</li>
+<li>dynamic：这个包中包含dynamic client，用来执行任意API资源对象的通用操作。</li>
+<li>plugin/pkg/client/auth：这个包提供了可选的用于获取外部源证书的认证插件。</li>
+<li>transport：这个包用于设置认证和建立连接。</li>
+<li>tools/cache：这个包中放了很多和开发控制器相关的工具集。</li>
 </ul>
-<p><img src="../images/pod.png" alt="pod" /></p>
-<ul>
-<li>为了实现pod的灵活控制，我们把pod做了分组，交由pod controller管理。pod controller其实是Master中的Controller Manager提供的功能。一个pod controller保存了其下属的pod的模板，拿到了pod controller我们就可以随意的创建、销毁、修改一组pod。当pod controller下属的pod被删除或者出故障后，pod controller会重建一个pod代替它。</li>
-<li>pod随时可能被销毁和重建，为了保证pod中应用程序的数据安全，把数据存储在pvc中。pvc它是k8s提供的存储服务，pvc中的数据未必就存储在当前机器上，它相当于是一个服务接口，其实现可以是各异的（类似于接口有很多实现类，用不同的方式实现了安全的存储，但是这些你无需关心，调接口用就完事了）。</li>
-<li>namespace的功能就是实现pod等资源的隔离，在某namespace中看不到其他namespace中的资源。</li>
-</ul>
-<p><strong>下面我们先换个角度，从Master看起。</strong></p>
-<p><img src="../images/s_master.png" alt="s_master" /></p>
-<ul>
-<li>Kubectl是我们控制集群的工具，Linux命令行交互工具。我们所有的控制命令都是通过这个组件下发到集群中的，这个组件在Master节点和Node节点上都可以存在，所以这里我把它画在了外部。</li>
-<li>Api server是Master中最核心的控制组件，其他组件都需要通过和他做交互实现相应的功能。这里的“功能”几乎涉及了k8s的各种服务，比如pod的创建、销毁、调度，服务的暴露等（相关概念后面的文章中会介绍）。</li>
-<li>Controller Manager就是Node中Pod Controller功能的实现根基。</li>
-<li>Scheduler是任务调度器，分发任务给node，提供了很多的任务分发策略，细节在后面文章中展开。</li>
-</ul>
-<blockquote>
-<p>这里我认为Node中的很多功能都是依托于Scheduler和Controller Manager实现的，如负载均衡、缺陷和容忍、亲和性、Pod Controller中的很多功能等。</p>
-</blockquote>
-<ul>
-<li>etcd是Master的数据持久化工具（1.11版本之后掉电不丢失），是一种键值对数据库。Api Server会把很多操作存在里面，部分其他组件也可以在这里取数据。当机器突然故障后可以通过这里面的日志数据等恢复这个master。</li>
-<li>再看Kubelet，它是Api Server把“大脑”得到的结论付诸实践的工具，Master对Node中pod等资源的操作都是通过它实现的。</li>
-<li>Kube Proxy是Node中Pod的代理，它负责把Pod中应用提供的服务暴露出去。比如我们将应用部署到集群后，通过浏览器中输入ip加端口号就可以访问这项服务，这是Kube Proxy的功劳。</li>
-</ul>
-<h3 id="22-结构观察"><a class="markdownIt-Anchor" href="#22-结构观察"></a> 2.2 结构观察</h3>
-<p>我们可以观察在Master中上述各节点，他们都是以Pod形式运行在一个叫做kube-system的namespace中，我们可以用如下方式查看。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[root@master ~]# kubectl get pod -n kube-system</span><br><span class="line">NAMESPACE     NAME                             READY   STATUS    RESTARTS   AGE</span><br><span class="line">kube-system   coredns-6955765f44-68g6v         1/1     Running   0          2d1h</span><br><span class="line">kube-system   coredns-6955765f44-cs5r8         1/1     Running   0          2d1h</span><br><span class="line">kube-system   etcd-master                      1/1     Running   0          2d1h</span><br><span class="line">kube-system   kube-apiserver-master            1/1     Running   0          2d1h</span><br><span class="line">kube-system   kube-controller-manager-master   1/1     Running   0          2d1h</span><br><span class="line">kube-system   kube-flannel-ds-amd64-47r25      1/1     Running   0          2d1h</span><br><span class="line">kube-system   kube-flannel-ds-amd64-ls5lh      1/1     Running   0          2d1h</span><br><span class="line">kube-system   kube-proxy-685tk                 1/1     Running   0          2d1h</span><br><span class="line">kube-system   kube-proxy-87spt                 1/1     Running   0          2d1h</span><br><span class="line">kube-system   kube-scheduler-master            1/1     Running   0          2d1h</span><br></pre></td></tr></table></figure>
-<p>其中coredns等两个是专门用于域名解析的Pod，在此处不深究。kube-flannel则是专门用于网络通信的，此外其他的Pod均可以在里面找到。</p>
+<p><strong>client-go和Kubernetes的版本对应关系</strong></p>
+<p>Kubernetes版本大于或等于1.17.0时，cllient-go版本使用对应的v0.x.y；Kubernetes版本小于1.17.0时，client-go版本使用kubernetes-1.x.y。其中，x和y与Kubernetes版本号后两位保持一致，比如Kubernetes v1.17.0对应client-go v0.17.0。</p>
+<p><img src="../images/client-go-kubernetes-cooperate.png" alt="client-go-kubernetes-cooperate" /></p>
+<p><img src="../images/go-kube-coo.png" alt="go-kube-coo" /></p>
+<h3 id="2-源码概览"><a class="markdownIt-Anchor" href="#2-源码概览"></a> 2. 源码概览</h3>
+<h3 id="3-workqueue源码剖析"><a class="markdownIt-Anchor" href="#3-workqueue源码剖析"></a> 3. WorkQueue源码剖析</h3>
+<h3 id="4-deltafifi"><a class="markdownIt-Anchor" href="#4-deltafifi"></a> 4. DeltaFIFI</h3>
+<h3 id="5-indexer和threadsafestore"><a class="markdownIt-Anchor" href="#5-indexer和threadsafestore"></a> 5. Indexer和ThreadSafeStore</h3>
+<h3 id="listwatcher"><a class="markdownIt-Anchor" href="#listwatcher"></a> ListWatcher</h3>
+<h3 id="reflector"><a class="markdownIt-Anchor" href="#reflector"></a> Reflector</h3>
+<h3 id="informer"><a class="markdownIt-Anchor" href="#informer"></a> Informer</h3>
 <blockquote>
 <p>Notes：</p>
 <p>以上内容均为个人学习过程中的理解，理解和总结可能有偏差。文章内容会随着学习过程不断修改完善。</p>
@@ -366,13 +344,18 @@
     <div class="post-guide">
         <div class="item left">
             
-              <a href="/2023/04/23/2.%20Pod%E7%BB%86%E8%8A%82%E5%88%86%E6%9E%90/">
+              <a href="/2023/04/28/12.%20Deployment%20Controller%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">
                   <i class="fa fa-angle-left" aria-hidden="true"></i>
-                  Pod细节分析
+                  Operator开发进阶
               </a>
             
         </div>
         <div class="item right">
+            
+              <a href="/2023/04/28/9.%20GVK-%E7%BB%84%E3%80%81%E7%89%88%E6%9C%AC%E5%92%8C%E7%B1%BB%E5%9E%8B/">
+                GVK和GVR
+                <i class="fa fa-angle-right" aria-hidden="true"></i>
+              </a>
             
         </div>
     </div>
