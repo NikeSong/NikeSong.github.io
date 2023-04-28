@@ -329,22 +329,11 @@
 <p>export PATH=$PATH:/usr/local/go/bin</p>
 <p>上述方法的PATH 在终端关闭 后就会消失。所以还是建议通过编辑/etc/profile来改PATH，也可以修改家目录下的.bashrc(即：~/.bashrc)。</p>
 <p>修改环境变量</p>
-<ul>
-<li>
-<pre><code class="language-shell">vi /etc/profile
-<pre class="line-numbers language-none"><code class="language-none">
-- 最下面加上：
-
-  &#96;&#96;&#96;shell
-  export PATH&#x3D;$PATH:&#x2F;usr&#x2F;local&#x2F;xxx&#x2F;bin<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-</code></pre>
-</li>
-<li>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">vi</span> /etc/profile<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>最下面加上：</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token builtin class-name">export</span> <span class="token assign-left variable"><span class="token environment constant">PATH</span></span><span class="token operator">=</span><span class="token environment constant">$PATH</span>:/usr/local/xxx/bin<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <p>刷新环境变量</p>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token builtin class-name">source</span> /etc/profile<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-</li>
-</ul>
 </blockquote>
 <p><strong>报错3：</strong></p>
 <blockquote>
