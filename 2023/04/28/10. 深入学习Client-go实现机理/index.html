@@ -9,7 +9,7 @@
 	
 	<title>
 	
-		深入学习Client-Go实现机理（进行中） | 
+		Client-Go学习与实战 | 
 	 
 	倪克松的博客
 	</title>
@@ -134,7 +134,7 @@
 								<li class="file active">
 									<a href="/2023/04/28/10.%20%E6%B7%B1%E5%85%A5%E5%AD%A6%E4%B9%A0Client-go%E5%AE%9E%E7%8E%B0%E6%9C%BA%E7%90%86/">
                      
-										    深入学习Client-Go实现机理（进行中）
+										    Client-Go学习与实战
                      
 									</a>
 								</li>
@@ -145,7 +145,7 @@
 								<li class="file">
 									<a href="/2023/04/27/11.%20Operator%E5%BC%80%E5%8F%91%E8%BF%9B%E9%98%B6/">
                      
-										    Operator开发进阶（进行中）
+										    Operator开发进阶
                      
 									</a>
 								</li>
@@ -154,9 +154,20 @@
 			
 							<ul>
 								<li class="file">
-									<a href="/2023/04/28/12.%20Deployment%20Controller%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">
+									<a href="/2023/05/01/12.%20Java%20Client%20Library/">
                      
-										    Deployment Controller源码分析(未开始)
+										    Java Client Library
+                     
+									</a>
+								</li>
+								<div class="article-toc" style="display: none;"></div>
+							</ul>
+			
+							<ul>
+								<li class="file">
+									<a href="/2023/05/01/13.%20Java%E6%96%B0%E5%BB%BAOperator/">
+                     
+										    Java新建Operator
                      
 									</a>
 								</li>
@@ -269,7 +280,7 @@
 	<!-- 引入正文 -->
 	<div id="content">
 		<h1 id="article-title">
-	深入学习Client-Go实现机理（进行中）
+	Client-Go学习与实战
 </h1>
 
 <!-- meta -->
@@ -304,8 +315,9 @@
 
 <!-- content -->
 <div id="article-content">
-	<p>使用Kubebuilder已经屏蔽了不少client-go的细节，但是要深入Operator开发机制，还是需要对client-go有一定的理解。在GitHub（<a href="https://github.com/kubernetes/client-go%EF%BC%89%E4%B8%8A%E5%8F%AF%E4%BB%A5%E6%89%BE%E5%88%B0client-go%E7%9A%84%E6%BA%90%E7%A0%81">https://github.com/kubernetes/client-go）上可以找到client-go的源码</a></p>
-<h3 id="1-client-go的包结构">1. client-go的包结构</h3>
+	<h1>client-go是什么</h1>
+<p>client-go项目就是用于和Kubernetes API Server通信的Go语言开发工具包。虽然使用Kubebuilder已经屏蔽了不少client-go的细节，但是要深入Operator开发机制，还是需要对client-go有一定的理解。</p>
+<h2 id="client-go的包结构">client-go的包结构</h2>
 <ul>
 <li>kubernetes：这个包中放的是用client-gen自动生成的用来访问Kubernetes API的ClientSet，后面会经常看到ClientSet这个工具。</li>
 <li>discovery：这个包提供了一种机制用来发现API Server支持的API资源。</li>
@@ -314,17 +326,323 @@
 <li>transport：这个包用于设置认证和建立连接。</li>
 <li>tools/cache：这个包中放了很多和开发控制器相关的工具集。</li>
 </ul>
+<h2 id="版本对应关系">版本对应关系</h2>
 <p><strong>client-go和Kubernetes的版本对应关系</strong></p>
 <p>Kubernetes版本大于或等于1.17.0时，cllient-go版本使用对应的v0.x.y；Kubernetes版本小于1.17.0时，client-go版本使用kubernetes-1.x.y。其中，x和y与Kubernetes版本号后两位保持一致，比如Kubernetes v1.17.0对应client-go v0.17.0。</p>
 <p><img src="/images/client-go-kubernetes-cooperate.png" alt="client-go-kubernetes-cooperate"></p>
 <p><img src="/images/go-kube-coo.png" alt="go-kube-coo"></p>
-<h3 id="2-源码概览">2. 源码概览</h3>
-<h3 id="3-WorkQueue源码剖析">3. WorkQueue源码剖析</h3>
-<h3 id="4-DeltaFIFI">4. DeltaFIFI</h3>
-<h3 id="5-Indexer和ThreadSafeStore">5. Indexer和ThreadSafeStore</h3>
-<h3 id="ListWatcher">ListWatcher</h3>
-<h3 id="Reflector">Reflector</h3>
-<h3 id="Informer">Informer</h3>
+<h1>使用实例</h1>
+<h2 id="集群内认证配置">集群内认证配置</h2>
+<p>首先获得client-go，go get命令需要在go模块中使用，所以先创建一个go模块：</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">mkdir</span> myproject
+<span class="token builtin class-name">cd</span> myproject
+go mod init myproject<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p>获得版本匹配的client-go</p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">go</span> get k8s<span class="token punctuation">.</span>io<span class="token operator">/</span>client<span class="token operator">-</span><span class="token keyword">go</span>@v0<span class="token punctuation">.</span><span class="token number">17.4</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>现在已经拥有了client-go了，可以用client-go与api-server交互！</p>
+<p><strong>认证</strong></p>
+<p>在交互的时候首先面对的是认证的问题，我们随便编写一段代码发送HTTP请求给API Server肯定会因为认证问题而失败。下面通过client-go来编写一小段代码，完成认证后查询default命名空间下的Pod，并将其名字打印出来。</p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">package</span> main
+
+<span class="token keyword">import</span> <span class="token punctuation">(</span>
+	<span class="token string">"context"</span>
+	<span class="token string">"log"</span>
+	<span class="token string">"time"</span>
+
+	metav1 <span class="token string">"k8s.io/apimachinery/pkg/apis/meta/v1"</span>
+	<span class="token string">"k8s.io/client-go/kubernetes"</span>
+	<span class="token string">"k8s.io/client-go/rest"</span>
+<span class="token punctuation">)</span>
+
+<span class="token keyword">func</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">//读取认证信息，存入config</span>
+	config<span class="token punctuation">,</span> err <span class="token operator">:=</span> rest<span class="token punctuation">.</span><span class="token function">InClusterConfig</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		log<span class="token punctuation">.</span><span class="token function">Fatal</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+	<span class="token comment">//通过config初始化clientset,通过clientset可以实现各种资源的CURD操作。</span>
+	clientset<span class="token punctuation">,</span> err <span class="token operator">:=</span> kubernetes<span class="token punctuation">.</span><span class="token function">NewForConfig</span><span class="token punctuation">(</span>config<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		log<span class="token punctuation">.</span><span class="token function">Fatal</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+	
+	<span class="token keyword">for</span> <span class="token punctuation">&#123;</span>
+        <span class="token comment">////通过clientset来列出特定命名空间里的所有Pod</span>
+		pods<span class="token punctuation">,</span> err <span class="token operator">:=</span> clientset<span class="token punctuation">.</span><span class="token function">CoreV1</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">Pods</span><span class="token punctuation">(</span><span class="token string">"default"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>
+			<span class="token function">List</span><span class="token punctuation">(</span>context<span class="token punctuation">.</span><span class="token function">TODO</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> metav1<span class="token punctuation">.</span>ListOptions<span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+		<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+			log<span class="token punctuation">.</span><span class="token function">Fatal</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span>
+		<span class="token punctuation">&#125;</span>
+        <span class="token comment">//打印信息，每隔五秒打印一次</span>
+		log<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"There are %d pods in the cluster\n"</span><span class="token punctuation">,</span> <span class="token function">len</span><span class="token punctuation">(</span>pods<span class="token punctuation">.</span>Items<span class="token punctuation">)</span><span class="token punctuation">)</span>
+		<span class="token keyword">for</span> i<span class="token punctuation">,</span> pod <span class="token operator">:=</span> <span class="token keyword">range</span> pods<span class="token punctuation">.</span>Items <span class="token punctuation">&#123;</span>
+			log<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"%d -> %s/%s"</span><span class="token punctuation">,</span> i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">,</span> pod<span class="token punctuation">.</span>Namespace<span class="token punctuation">,</span> pod<span class="token punctuation">.</span>Name<span class="token punctuation">)</span>
+		<span class="token punctuation">&#125;</span>
+		<span class="token operator">&lt;-</span>time<span class="token punctuation">.</span><span class="token function">Tick</span><span class="token punctuation">(</span><span class="token number">5</span> <span class="token operator">*</span> time<span class="token punctuation">.</span>Second<span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>在Kubernetes中，<strong>Pod创建时会自动把ServiceAccount token挂载到容器内的/var/run/secrets/kubernetes.io/serviceaccount路径下</strong>，代码中的InClusterConfig()函数也是基于这个原理读取了<strong>认证所需的token和ca.crt两个文件</strong>。</p>
+<p><strong>编写Dockerfile</strong><br>
+我们只需简单地将代码放到容器中运行，所以Dockerfile不需要太复杂。</p>
+<p><strong>编译代码</strong></p>
+<p><strong>容器化</strong></p>
+<p><code>docker build</code> 命令即可</p>
+<p><strong>创建ClusterRoleBinding</strong></p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">kubectl create clusterrolebinding default-view --clusterrole-view <span class="token parameter variable">--serviceaccount</span><span class="token operator">=</span>default:default<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>为了能够列出所有Pod，需要给default Service Account View权限。</p>
+<p><strong>启动Pod</strong></p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">kubectl run <span class="token parameter variable">-i</span> in-cluster <span class="token parameter variable">--image</span><span class="token operator">=</span>in-cluster:v1<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<p>然后就可以看到此pod一直在输出信息</p>
+<h2 id="集群外认证配置">集群外认证配置</h2>
+<p>以上是集群内认证的方法，下面我们尝试在集群外认证，用集群外运行的服务访问api-server。</p>
+<p>集群内认证的关键就是挂载了token和ca.crt文件，在集群外呢？我们知道kubectl工具就没有运行在集群内部，它是和用户交互的命令行工具，它的实现原理就是拿到kubeconfig文件，所以我们也是通过这种方式。</p>
+<p>核心代码main.go如下所示</p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">//1. 获取kubeconfig路径</span>
+	homePath <span class="token operator">:=</span> homedir<span class="token punctuation">.</span><span class="token function">HomeDir</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token keyword">if</span> homePath <span class="token operator">==</span> <span class="token string">""</span> <span class="token punctuation">&#123;</span>
+		log<span class="token punctuation">.</span><span class="token function">Fatal</span><span class="token punctuation">(</span><span class="token string">"failed to get the home directory"</span><span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+    <span class="token comment">//2. 获得kubeconfig</span>
+	kubeconfig <span class="token operator">:=</span> filepath<span class="token punctuation">.</span><span class="token function">Join</span><span class="token punctuation">(</span>homePath<span class="token punctuation">,</span> <span class="token string">".kube"</span><span class="token punctuation">,</span> <span class="token string">"config"</span><span class="token punctuation">)</span>
+    <span class="token comment">/*首先通过k8s.io/client-go/util/homedir包提供的HomeDir()函数获取用户家目录，
+    然后拼接kubeconfig的地址。
+    比如在笔者的MacBook上，kubeconfig的路径是/Users/danielhu/.kube/config
+    */</span>
+    
+    <span class="token comment">//3. 通过kubeconfig初始化config</span>
+	config<span class="token punctuation">,</span> err <span class="token operator">:=</span> clientcmd<span class="token punctuation">.</span><span class="token function">BuildConfigFromFlags</span><span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">,</span> kubeconfig<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		log<span class="token punctuation">.</span><span class="token function">Fatal</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+    <span class="token comment">/*BuildConfigFromFlags()函数的两个参数分别是string类型的masterUrl和kubeconfigPath。
+    这里我们只给了第二个参数，因为kubeconfig中已经包含API Server的连接信息。
+    BuildConfigFromFlags()会根据kubeconfig文件中的配置来初始化Config对象，
+    然后和InClusterConfig()函数一样会返回一个*Config对象
+    */</span>
+
+	clientset<span class="token punctuation">,</span> err <span class="token operator">:=</span> kubernetes<span class="token punctuation">.</span><span class="token function">NewForConfig</span><span class="token punctuation">(</span>config<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		log<span class="token punctuation">.</span><span class="token function">Fatal</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+
+	<span class="token keyword">for</span> <span class="token punctuation">&#123;</span>
+		pods<span class="token punctuation">,</span> err <span class="token operator">:=</span> clientset<span class="token punctuation">.</span><span class="token function">CoreV1</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">Pods</span><span class="token punctuation">(</span><span class="token string">"default"</span><span class="token punctuation">)</span><span class="token punctuation">.</span>
+			<span class="token function">List</span><span class="token punctuation">(</span>context<span class="token punctuation">.</span><span class="token function">TODO</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> metav1<span class="token punctuation">.</span>ListOptions<span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+		<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+			log<span class="token punctuation">.</span><span class="token function">Fatal</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span>
+		<span class="token punctuation">&#125;</span>
+		log<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"There are %d pods in the cluster\n"</span><span class="token punctuation">,</span> <span class="token function">len</span><span class="token punctuation">(</span>pods<span class="token punctuation">.</span>Items<span class="token punctuation">)</span><span class="token punctuation">)</span>
+		<span class="token keyword">for</span> i<span class="token punctuation">,</span> pod <span class="token operator">:=</span> <span class="token keyword">range</span> pods<span class="token punctuation">.</span>Items <span class="token punctuation">&#123;</span>
+			log<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"%d -> %s/%s"</span><span class="token punctuation">,</span> i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">,</span> pod<span class="token punctuation">.</span>Namespace<span class="token punctuation">,</span> pod<span class="token punctuation">.</span>Name<span class="token punctuation">)</span>
+		<span class="token punctuation">&#125;</span>
+		<span class="token operator">&lt;-</span>time<span class="token punctuation">.</span><span class="token function">Tick</span><span class="token punctuation">(</span><span class="token number">5</span> <span class="token operator">*</span> time<span class="token punctuation">.</span>Second<span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>这次我们并没有去做容器化，因为直接在本地运行就已经足够说明问题了。</p>
+<p>这样的方式更加方便，不需要在kubenetes中放入当前的pod，非侵入，很好。</p>
+<h2 id="client-go操作Deployment">client-go操作Deployment</h2>
+<p><strong>main函数实现的主逻辑</strong></p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">//1. 获得权限</span>
+	homePath <span class="token operator">:=</span> homedir<span class="token punctuation">.</span><span class="token function">HomeDir</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token keyword">if</span> homePath <span class="token operator">==</span> <span class="token string">""</span> <span class="token punctuation">&#123;</span>
+		log<span class="token punctuation">.</span><span class="token function">Fatal</span><span class="token punctuation">(</span><span class="token string">"failed to get the home directory"</span><span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+
+	kubeconfig <span class="token operator">:=</span> filepath<span class="token punctuation">.</span><span class="token function">Join</span><span class="token punctuation">(</span>homePath<span class="token punctuation">,</span> <span class="token string">".kube"</span><span class="token punctuation">,</span> <span class="token string">"config"</span><span class="token punctuation">)</span>
+
+	config<span class="token punctuation">,</span> err <span class="token operator">:=</span> clientcmd<span class="token punctuation">.</span><span class="token function">BuildConfigFromFlags</span><span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">,</span> kubeconfig<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		log<span class="token punctuation">.</span><span class="token function">Fatal</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+
+	clientset<span class="token punctuation">,</span> err <span class="token operator">:=</span> kubernetes<span class="token punctuation">.</span><span class="token function">NewForConfig</span><span class="token punctuation">(</span>config<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		log<span class="token punctuation">.</span><span class="token function">Fatal</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span>
+    <span class="token punctuation">&#125;</span>
+    
+    <span class="token comment">//获得dpClient</span>
+    <span class="token comment">//dpClient是通过clientset.AppsV1().Deployments()调用获得的，</span>
+    <span class="token comment">//这是一个DeploymentInterface类型</span>
+    <span class="token comment">//可以用来对Deployment类型</span>
+    <span class="token comment">//Get()、List()、Watch()、Create()、Update()、Delete()、Patch()等</span>
+	dpClient <span class="token operator">:=</span> clientset<span class="token punctuation">.</span><span class="token function">AppsV1</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>
+		<span class="token function">Deployments</span><span class="token punctuation">(</span>corev1<span class="token punctuation">.</span>NamespaceDefault<span class="token punctuation">)</span>
+
+    <span class="token comment">//create、update、delete三个函数的调用，间隔是1分钟</span>
+	log<span class="token punctuation">.</span><span class="token function">Println</span><span class="token punctuation">(</span><span class="token string">"create Deployment"</span><span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">:=</span> <span class="token function">createDeployment</span><span class="token punctuation">(</span>dpClient<span class="token punctuation">)</span><span class="token punctuation">;</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		log<span class="token punctuation">.</span><span class="token function">Fatal</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+	<span class="token operator">&lt;-</span>time<span class="token punctuation">.</span><span class="token function">Tick</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">*</span> time<span class="token punctuation">.</span>Minute<span class="token punctuation">)</span>
+
+	log<span class="token punctuation">.</span><span class="token function">Println</span><span class="token punctuation">(</span><span class="token string">"update Deployment"</span><span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">:=</span> <span class="token function">updateDeployment</span><span class="token punctuation">(</span>dpClient<span class="token punctuation">)</span><span class="token punctuation">;</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		log<span class="token punctuation">.</span><span class="token function">Fatal</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+	<span class="token operator">&lt;-</span>time<span class="token punctuation">.</span><span class="token function">Tick</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">*</span> time<span class="token punctuation">.</span>Minute<span class="token punctuation">)</span>
+
+	log<span class="token punctuation">.</span><span class="token function">Println</span><span class="token punctuation">(</span><span class="token string">"delete Deployment"</span><span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">:=</span> <span class="token function">deleteDeployment</span><span class="token punctuation">(</span>dpClient<span class="token punctuation">)</span><span class="token punctuation">;</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		log<span class="token punctuation">.</span><span class="token function">Fatal</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+	<span class="token operator">&lt;-</span>time<span class="token punctuation">.</span><span class="token function">Tick</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">*</span> time<span class="token punctuation">.</span>Minute<span class="token punctuation">)</span>
+
+	log<span class="token punctuation">.</span><span class="token function">Println</span><span class="token punctuation">(</span><span class="token string">"end"</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>创建</strong>：先构造一个newDp，然后调用dpClient的Create()函数来创建这个Deployment。</p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">createDeployment</span><span class="token punctuation">(</span>dpClient v1<span class="token punctuation">.</span>DeploymentInterface<span class="token punctuation">)</span> <span class="token builtin">error</span> <span class="token punctuation">&#123;</span>
+	replicas <span class="token operator">:=</span> <span class="token function">int32</span><span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">)</span>
+	newDp <span class="token operator">:=</span> <span class="token operator">&amp;</span>appsv1<span class="token punctuation">.</span>Deployment<span class="token punctuation">&#123;</span>
+		ObjectMeta<span class="token punctuation">:</span> metav1<span class="token punctuation">.</span>ObjectMeta<span class="token punctuation">&#123;</span>
+			Name<span class="token punctuation">:</span> <span class="token string">"nginx-deploy"</span><span class="token punctuation">,</span>
+		<span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+		Spec<span class="token punctuation">:</span> appsv1<span class="token punctuation">.</span>DeploymentSpec<span class="token punctuation">&#123;</span>
+			Replicas<span class="token punctuation">:</span> <span class="token operator">&amp;</span>replicas<span class="token punctuation">,</span>
+			Selector<span class="token punctuation">:</span> <span class="token operator">&amp;</span>metav1<span class="token punctuation">.</span>LabelSelector<span class="token punctuation">&#123;</span>
+				MatchLabels<span class="token punctuation">:</span> <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token builtin">string</span><span class="token punctuation">&#123;</span>
+					<span class="token string">"app"</span><span class="token punctuation">:</span> <span class="token string">"nginx"</span><span class="token punctuation">,</span>
+				<span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+			<span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+			Template<span class="token punctuation">:</span> corev1<span class="token punctuation">.</span>PodTemplateSpec<span class="token punctuation">&#123;</span>
+				ObjectMeta<span class="token punctuation">:</span> metav1<span class="token punctuation">.</span>ObjectMeta<span class="token punctuation">&#123;</span>
+					Labels<span class="token punctuation">:</span> <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token builtin">string</span><span class="token punctuation">&#123;</span>
+						<span class="token string">"app"</span><span class="token punctuation">:</span> <span class="token string">"nginx"</span><span class="token punctuation">,</span>
+					<span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+				<span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+				Spec<span class="token punctuation">:</span> corev1<span class="token punctuation">.</span>PodSpec<span class="token punctuation">&#123;</span>
+					Containers<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>corev1<span class="token punctuation">.</span>Container<span class="token punctuation">&#123;</span>
+						<span class="token punctuation">&#123;</span>
+							Name<span class="token punctuation">:</span>  <span class="token string">"nginx"</span><span class="token punctuation">,</span>
+							Image<span class="token punctuation">:</span> <span class="token string">"nginx:1.14"</span><span class="token punctuation">,</span>
+							Ports<span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>corev1<span class="token punctuation">.</span>ContainerPort<span class="token punctuation">&#123;</span>
+								<span class="token punctuation">&#123;</span>
+									Name<span class="token punctuation">:</span>          <span class="token string">"http"</span><span class="token punctuation">,</span>
+									Protocol<span class="token punctuation">:</span>      corev1<span class="token punctuation">.</span>ProtocolTCP<span class="token punctuation">,</span>
+									ContainerPort<span class="token punctuation">:</span> <span class="token number">80</span><span class="token punctuation">,</span>
+								<span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+							<span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+						<span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+					<span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+				<span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+			<span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+		<span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+	<span class="token punctuation">&#125;</span>
+	<span class="token boolean">_</span><span class="token punctuation">,</span> err <span class="token operator">:=</span> dpClient<span class="token punctuation">.</span><span class="token function">Create</span><span class="token punctuation">(</span>context<span class="token punctuation">.</span><span class="token function">TODO</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+		newDp<span class="token punctuation">,</span> metav1<span class="token punctuation">.</span>CreateOptions<span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+	<span class="token keyword">return</span> err
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>更新</strong>：</p>
+<p><strong>获取nginx-deploy：</strong><br>
+我们通过dpClient的Get()方法获取到一个*Deployment对象，然后就可以操作这个对象了。</p>
+<p><strong>修改镜像字段：</strong><br>
+我们把Image配置成nginx:1.16，这样会触发一次Pod的滚动更新。</p>
+<p><strong>调用Update()函数完成更新：</strong><br>
+这里的主要逻辑调用dpClient.Update()来完成Deployment的更新。外层包的RetryOnConflict()函数只是一种健壮性手段，如果Update过程失败了，这里能提供重试机制。RetryOnConflict()函数签名是这样的：</p>
+<pre class="line-numbers language-update" data-language="update"><code class="language-update">func updateDeployment(dpClient v1.DeploymentInterface) error &#123;
+	dp, err :&#x3D; dpClient.Get(context.TODO(),
+		&quot;nginx-deploy&quot;, metav1.GetOptions&#123;&#125;)
+	if err !&#x3D; nil &#123;
+		return err
+	&#125;
+	dp.Spec.Template.Spec.Containers[0].Image &#x3D; &quot;nginx:1.16&quot;
+
+	return retry.RetryOnConflict(
+		retry.DefaultRetry, func() error &#123;
+			_, err &#x3D; dpClient.Update(context.TODO(),
+				dp, metav1.UpdateOptions&#123;&#125;)
+			return err
+		&#125;,
+	)
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>删除：</strong></p>
+<p>这里同样通过dpClient的Delete()方法完成删除操作，里面的PropagationPolicy属性配置了metav1. DeletePropagationForeground，这里有三种可选特性：</p>
+<ul>
+<li>DeletePropagationOrphan：不考虑依赖资源。</li>
+<li>DeletePropagationBackground：后台删除依赖资源。</li>
+<li>DeletePropagationForeground：前台删除依赖资源</li>
+</ul>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">deleteDeployment</span><span class="token punctuation">(</span>dpClient v1<span class="token punctuation">.</span>DeploymentInterface<span class="token punctuation">)</span> <span class="token builtin">error</span> <span class="token punctuation">&#123;</span>
+	deletePolicy <span class="token operator">:=</span> metav1<span class="token punctuation">.</span>DeletePropagationForeground
+	<span class="token keyword">return</span> dpClient<span class="token punctuation">.</span><span class="token function">Delete</span><span class="token punctuation">(</span>
+		context<span class="token punctuation">.</span><span class="token function">TODO</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">"nginx-deploy"</span><span class="token punctuation">,</span> metav1<span class="token punctuation">.</span>DeleteOptions<span class="token punctuation">&#123;</span>
+			PropagationPolicy<span class="token punctuation">:</span> <span class="token operator">&amp;</span>deletePolicy<span class="token punctuation">,</span>
+		<span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+	<span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h1>client-go源码概览</h1>
+<p>client-go项目是与kube-apiserver通信的clients的具体实现，其中包含很多相关工具包，例如kubernetes包就包含与Kubernetes API通信的各种ClientSet，而tools/cache包则包含很多强大的编写控制器相关的组件。所以接下来我们会以自定义控制器的底层实现原理为线索，来分析client-go中相关模块的源码实现。</p>
+<p>我们在编写自定义控制器的过程中大致依赖于如下组件，其中<strong>圆形的是自定义控制器中需要编码的部分</strong>，其他椭圆和圆角矩形的是client-go提供的一些“工具”。</p>
+<p><img src="../images/client_go_structure.png" alt="client_go_structure"></p>
+<p><em>图片源自《Kubenetes Operator开发进阶》</em></p>
+<ul>
+<li><strong>Reflector</strong>：Reflector从apiserver监听（watch）特定类型的资源，拿到变更通知后，将其丢到DeltaFIFO队列中。</li>
+<li><strong>Informer</strong>：Informer从DeltaFIFO中弹出（pop）相应对象，然后通过Indexer将对象和索引丢到本地cache中，再触发相应的事件处理函数（Resource Event Handlers）。</li>
+<li><strong>Indexer</strong>：Indexer主要提供一个对象根据一定条件检索的能力，典型的实现是通过namespace/name来构造key，通过Thread Safe Store来存储对象。</li>
+<li><strong>WorkQueue</strong>：WorkQueue一般使用的是延时队列实现，在Resource Event Handlers中会完成将对象的key放入WorkQueue的过程，然后在自己的逻辑代码里从WorkQueue中消费这些key。</li>
+<li><strong>ClientSet</strong>：ClientSet提供的是资源的CURD能力，与apiserver交互。</li>
+<li><strong>Resource Event Handlers</strong>：我们一般在Resource Event Handlers中添加一些简单的过滤功能，判断哪些对象需要加到WorkQueue中进一步处理，对于需要加到WorkQueue中的对象，就提取其key，然后入队。</li>
+<li><strong>Worker</strong>：Worker指的是我们自己的业务代码处理过程，在这里可以直接收到WorkQueue中的任务，可以通过Indexer从本地缓存检索对象，通过ClientSet实现对象的增、删、改、查逻辑。</li>
+</ul>
+<p><strong>阅读完上述内容就可以理解，我们基于client-go做operator开发，只需要编写event habdlers和worker就可以了，其中event handlers负责把任务加入work queue，worker从workqueue取出任务处理即可。</strong></p>
+<p><strong>我们同时可以应该尽量理解用到的各种组件，使我们的开发更放心，也更合适，更准确。</strong></p>
+<h2 id="WorkQueue">WorkQueue</h2>
+<p>WorkQueue一般使用延时队列实现，在Resource Event Handlers中会完成将对象的key放入WorkQueue的过程，然后在自己的逻辑代码里从WorkQueue中消费这些key。</p>
+<p><img src="../images/client_go_structure.png" alt="client_go_structure"></p>
+<p>client-go的util/workqueue包里主要有三个队列，分别是普通队列、延时队列和限速队列，后一个队列以前一个队列的实现为基础，层层添加新功能。<a target="_blank" rel="noopener" href="http://xn--k8s-lp6e.io/client-go/util/workqueue%E5%8C%85%E4%B8%8B%E5%8F%AF%E4%BB%A5%E7%9C%8B%E5%88%B0%E8%BF%99%E6%A0%B7%E4%B8%89%E4%B8%AAGo%E6%BA%90%E6%96%87%E4%BB%B6%EF%BC%9A">在k8s.io/client-go/util/workqueue包下可以看到这样三个Go源文件：</a></p>
+<ul>
+<li>queue.go</li>
+<li>delaying_queue.go</li>
+<li>rate_limiting_queue.go。</li>
+</ul>
+<p>很明显这三个文件分别对应三种队列实现。</p>
+<h3 id="延时队列DelayingQueue">延时队列DelayingQueue</h3>
+<p>定义DelayingQueue的接口在delaying_queue.go源文件中。</p>
+<p><img src="../images/queue_delaying.png" alt="queue_delaying"></p>
+<p>可以看到DelayingInterface接口中嵌套了一个表示Queue的Interface，也就是说DelayingInterface接口包含Interface接口的所有方法声明。</p>
+<p>我们继续看对应实现这个接口的结构体：</p>
+<p><img src="../images/dalaying_type.png" alt="dalaying_type"></p>
+<p>对于延时队列，我们关注的入口方法肯定就是新增的AddAfter()，在查看这个方法的具体逻辑前，先了解上面delayingType中涉及的waitFor类型。</p>
+<p>waitFor的实现也在delaying_queue.go中，其结构体定义如下：</p>
+<p><img src="../images/wait_for.png" alt="wait_for"></p>
+<p>在waitFor结构体下面有这样一行代码：</p>
+<p><img src="../images/one_line_waitfor.png" alt="one_line_waitfor"></p>
+<p>这里定义了一个waitFor的优先级队列，用最小堆的方式来实现，这个类型实现了heap.Interface接口。</p>
+<p><img src="../images/heap_min_delaying_ququ.png" alt="heap_min_delaying_ququ"></p>
+<p>我们在开发自定义控制器的时候，用到的WorkQueue就是使用这里的延时队列实现的，在Resource Event Handlers中会完成将对象的key（键）放入WorkQueue的过程，然后我们在自己的逻辑代码里从WorkQueue中消费这些key。一个延时队列也就是实现了item（元素）的延时入队效果，内部是一个“优先级队列”，用了“最小堆”（有序完全二叉树）。</p>
+<h2 id="DeltaFIFI">DeltaFIFI</h2>
+<p><a target="_blank" rel="noopener" href="http://xn--DeltaFIFOk8s-z76s500agkw5k0j1xd.io/client-go/tools/cache%E5%8C%85%E4%B8%AD%E3%80%82">DeltaFIFO相关代码在k8s.io/client-go/tools/cache包中。</a></p>
+<p>在fifo.go中定义了一个Queue接口，本节的主角DeltaFIFO就是Queue接口的一个实现。我们先来看Queue接口的代码：</p>
+<p><img src="../images/queue_inteface.png" alt="queue_inteface"></p>
+<p>Queue接口内嵌套了一个Store接口，Store定义在store.go中，代码如下：</p>
+<p><img src="../images/store_inteface.png" alt="store_inteface"></p>
+<p>Store接口的方法基本可以望文生义，很直观，我们后面看一下在DeltaFIFO中是如何实现Store接口的。</p>
+<p><img src="../images/delta_fifo.png" alt="delta_fifo"></p>
+<p>可以看到items属性是一个map，map的value是一个Deltas类型的。原来DeltaType是一个字符串，对应的是用Added、Updated这种单词描述一个Delta的类型。将这些信息加在一起，我们可以尝试画出来DeltaFIFO的结构，大致如下所示。</p>
+<p><img src="../images/all_structure_deltafifo.png" alt="all_structure_deltafifo"></p>
+<p>首先DeltaFIFO结构体中有queue和items两个主要的属性，类型分别是[]string和map[string]Deltas，然后map[string]Deltas的key也就是default/pod1这种格式的字符串，这个后面会看到，而value是类型为[]Delta的Deltas，这个Delta的属性也就是Type和Object，Type是前面提到的Added、Updated、Deleted这类字符串表示的DeltaType，Object就是这个Delta对应的对象，比如具体的某个Pod。</p>
+<h2 id="Indexer-和-ThreadSafeStore">Indexer 和 ThreadSafeStore</h2>
+<p><img src="../images/client_go_structure.png" alt="client_go_structure"></p>
+<p>我们在前面讲过Indexer主要为对象提供根据一定条件进行检索的能力，典型的实现是通过namespace/name来构造key，通过ThreadSafeStore来存储对象。</p>
+<p>换言之，Indexer主要依赖于ThreadSafeStore实现，是client-go提供的一种缓存机制，通过检索本地缓存可以有效降低apiserver的压力。</p>
+<h2 id="ListWatcher">ListWatcher</h2>
+<p>ListerWatcher是Reflector的一个主要能力提供者，<a target="_blank" rel="noopener" href="http://xn--ListerWatcherk8s-hr2z020imx3ddjudwsgg35l.io/client-go/tools/cache%E5%8C%85%E4%B8%AD%E3%80%82">ListerWatcher的代码还是在k8s.io/client-go/tools/cache包中。</a></p>
+<h2 id="Reflector">Reflector</h2>
+<p>我们前面提到过Reflector的任务就是从apiserver监听（watch）特定类型的资源，拿到变更通知后，将其丢到DeltaFIFO队列中，也介绍了ListerWatcher是如何从apiserver中列选-监听（List-Watch）资源的。<a target="_blank" rel="noopener" href="http://xn--Reflectork8s-sl5ss70hx6n.io/client-go/tools/cache%E5%8C%85%E4%B8%8B%E3%80%82">Reflector定义在k8s.io/client-go/tools/cache包下。</a></p>
+<p>Reflector的职责很清晰，要做的事情是保持DeltaFIFO中的items持续更新，具体实现是通过ListerWatcher提供的list-watch（列选-监听）能力来列选指定类型的资源，这时会产生一系列Sync事件，然后通过列选到的ResourceVersion来开启监听过程，而监听到新的事件后，会和前面提到的Sync事件一样，都通过DeltaFIFO提供的方法构造相应的DeltaType添加到DeltaFIFO中。当然，前面提到的更新也并不是直接修改DeltaFIFO中已经存在的元素，而是添加一个新的DeltaType到队列中。另外，DeltaFIFO中添加新DeltaType时也会有一定的去重机制，我们在5.3节和5.5节中分别介绍过ListerWatcher和DeltaFIFO组件的工作逻辑，有了这个基础后再看Reflector的工作流就相对轻松很多了。<br>
+这里还有一个细节就是监听过程不是一劳永逸的，监听到新的事件后，会拿着对象的新ResourceVersion重新开启一轮新的监听过程。当然，这里的watch调用也有超时机制，一系列的健壮性措施，所以我们脱离Reflector(Informer)直接使用list-watch还是很难直接写出一套健壮的代码逻辑。</p>
+<h2 id="Informer">Informer</h2>
+<p>在client-go源码分析的最后一节中，我们准备分析Informer。Informer这个词的出镜率很高，我们在很多文章中都可以看到Informer的身影，在源码中真的去找一个叫作Informer的对象，却又发现找不到一个单纯的Informer，但是有很多结构体或者接口中包含Informer这个词。<br>
+与Reflector、WorkQueue等组件不同，Informer相对来说更加模糊，让人初读源码时感觉迷惑。今天我们一起来揭开Informer的面纱，看一下它到底是什么。<br>
+我们在一开始提到过Informer从DeltaFIFO中Pop相应的对象，然后通过Indexer将对象和索引丢到本地cache中，再触发相应的事件处理函数（Resource Event Handlers）的运行。接下来我们通过源码来理解一下整个过程。</p>
+<p>Informer通过一个Controller对象来定义，本身结构很简单，<a target="_blank" rel="noopener" href="http://xn--k8s-ot9dm09a0oq.io/client-go/tools/cache%E5%8C%85%E4%B8%AD%E7%9A%84controller.go%E6%BA%90%E6%96%87%E4%BB%B6%E4%B8%AD%E5%8F%AF%E4%BB%A5%E7%9C%8B%E5%88%B0Controller%E7%9A%84%E5%AE%9A%E4%B9%89%EF%BC%9A">我们在k8s.io/client-go/tools/cache包中的controller.go源文件中可以看到Controller的定义：</a></p>
+<p><img src="../images/controller.png" alt="controller"></p>
+<p>这里有我们熟悉的Reflector，可以猜到Informer启动时会去运行Reflector，从而通过Reflector实现list-watch apiserver，更新“事件”到DeltaFIFO中用于进一步处理。我们继续了解controller对应的Controller接口：</p>
+<p><img src="../images/interface_controller.png" alt="interface_controller"></p>
+<p>这里的核心方法很明显是Run(stopCh&lt;-chan struct{})，Run负责两件事情：<br>
+1）构造Reflector利用ListerWatcher的能力将对象事件更新到DeltaFIFO。<br>
+2）从DeltaFIFO中Pop对象后调用ProcessFunc来处理。</p>
 <blockquote>
 <p>Notes：</p>
 <p>以上内容均为个人学习过程中的理解，理解和总结可能有偏差。文章内容会随着学习过程不断修改完善。</p>
@@ -338,9 +656,9 @@
     <div class="post-guide">
         <div class="item left">
             
-              <a href="/2023/04/28/12.%20Deployment%20Controller%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">
+              <a href="/2023/05/01/12.%20Java%20Client%20Library/">
                   <i class="fa fa-angle-left" aria-hidden="true"></i>
-                  Deployment Controller源码分析(未开始)
+                  Java Client Library
               </a>
             
         </div>

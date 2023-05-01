@@ -9,7 +9,7 @@
 	
 	<title>
 	
-		Operator开发进阶（进行中） | 
+		Operator开发进阶 | 
 	 
 	倪克松的博客
 	</title>
@@ -134,7 +134,7 @@
 								<li class="file">
 									<a href="/2023/04/28/10.%20%E6%B7%B1%E5%85%A5%E5%AD%A6%E4%B9%A0Client-go%E5%AE%9E%E7%8E%B0%E6%9C%BA%E7%90%86/">
                      
-										    深入学习Client-Go实现机理（进行中）
+										    Client-Go学习与实战
                      
 									</a>
 								</li>
@@ -145,7 +145,7 @@
 								<li class="file active">
 									<a href="/2023/04/27/11.%20Operator%E5%BC%80%E5%8F%91%E8%BF%9B%E9%98%B6/">
                      
-										    Operator开发进阶（进行中）
+										    Operator开发进阶
                      
 									</a>
 								</li>
@@ -154,9 +154,20 @@
 			
 							<ul>
 								<li class="file">
-									<a href="/2023/04/28/12.%20Deployment%20Controller%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">
+									<a href="/2023/05/01/12.%20Java%20Client%20Library/">
                      
-										    Deployment Controller源码分析(未开始)
+										    Java Client Library
+                     
+									</a>
+								</li>
+								<div class="article-toc" style="display: none;"></div>
+							</ul>
+			
+							<ul>
+								<li class="file">
+									<a href="/2023/05/01/13.%20Java%E6%96%B0%E5%BB%BAOperator/">
+                     
+										    Java新建Operator
                      
 									</a>
 								</li>
@@ -269,7 +280,7 @@
 	<!-- 引入正文 -->
 	<div id="content">
 		<h1 id="article-title">
-	Operator开发进阶（进行中）
+	Operator开发进阶
 </h1>
 
 <!-- meta -->
@@ -304,9 +315,18 @@
 
 <!-- content -->
 <div id="article-content">
-	<p>一般我们需要将一个应用部署到Kubernetes中时，都会选择用Deployment来管理应用，用Service来做服务发现，进一步可能还需要配置ConfigMap、Ingress、Secret等资源。这么多类型资源的创建、维护、管理工作会变得烦琐且复杂。</p>
+	<p>先复习一下上次的简单实验的流程</p>
+<p><img src="/images/summarize_helloworld.png" alt=""></p>
+<p>make manifests后并没有做什么操作，只是对文件进行了观察。所以</p>
+<ul>
+<li><strong>CRD的配置全都是在application_types.go中完成的</strong>。</li>
+<li><strong>CR的配置也都是在config\ samples\ apps_v2_application.yaml中完成的</strong>。</li>
+<li><strong>controller的设置全都是在controllers/ application_controller.go文件中完成的</strong>。</li>
+</ul>
+<p>简单的回顾后开始这次更加复杂的实验：</p>
+<p>一般我们需要将一个应用部署到Kubernetes中时，都会选择用Deployment来管理应用，用Service来做服务发现，进一步可能还需要配置ConfigMap、Ingress、Secret等资源。这么多类型资源的创建、维护、管理工作会变得烦琐且复杂。</p>
 <blockquote>
-<p>部署在K8s中的应用：</p>
+<p>**总结：**部署在K8s中的应用：</p>
 <ul>
 <li>Deployment等controler做管理</li>
 <li>Service做服务发现</li>
@@ -317,12 +337,12 @@
 </blockquote>
 <p>我们可以通过Operator在一个应用部署所需的各种资源之上抽象一个Application类型，这个类型里包含必要的一些字段，然后用户只需要创建一个Application，我们通过自定义控制器去完成Application相关的Deployment、Service、ConfigMap等资源的创建和管理工作。</p>
 <h3 id="1-初始化项目">1. 初始化项目</h3>
-<p>初始化，别忘了vpn就完事了。</p>
+<p>初始化。</p>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token punctuation">[</span>root@master MyOPeratorProjects<span class="token punctuation">]</span><span class="token comment"># mkdir application-operator2</span>
 <span class="token punctuation">[</span>root@master MyOPeratorProjects<span class="token punctuation">]</span><span class="token comment"># cd application-operator2</span>
 <span class="token punctuation">[</span>root@master application-operator2<span class="token punctuation">]</span><span class="token comment"># ls</span>
 <span class="token punctuation">[</span>root@master application-operator2<span class="token punctuation">]</span><span class="token comment"># kubebuilder init --domain=danielhu.cn --repo=github.com/daniel-hutao/application-operator --owner Daniel.Hu</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-<p>项目名默认是application-operator，项目名和文件夹名字一致。这里需要知道的是项目名体现在哪些地方，找到这些配置项，手动调整即可：<br>
+<p>项目名默认是application-operator，项目名和文件夹名字一致。这里需要知道的是项目名体现在哪些地方，若要修改项目名找到这些配置项调整即可：<br>
 1）PROJECT文件中的projectName配置。<br>
 2）config/default/kustomization.yaml文件中的namespace配置。<br>
 3）config/default/kustomization.yaml文件中的namePrefix配置。</p>
@@ -350,7 +370,7 @@
 </ul>
 <h3 id="2-定义Application资源">2. 定义Application资源</h3>
 <h4 id="2-1-API结构分析">2.1 API结构分析</h4>
-<p>和第一次实验一样，这里我们需要创建Application类型和其对应的控制器，其命令是kubebuilder create api：</p>
+<p>和第一次实验一样，这里我们需要创建<strong>Application类型和其对应的控制器</strong>，其命令是kubebuilder create api：</p>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token punctuation">[</span>root@master application-operator2<span class="token punctuation">]</span><span class="token comment"># kubebuilder create api --group apps --version v1 --kind Application</span>
 Create Resource <span class="token punctuation">[</span>y/n<span class="token punctuation">]</span>
 y
@@ -359,7 +379,7 @@ y<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><s
 <p>此时项目路径有一次出现了 api / vi</p>
 <p><strong>分析</strong></p>
 <p>对于一个新的group-version，也就是组和版本都相同的一个资源类型，kubebuilder create api命令会新建一个目录来存放这个group-version。<a target="_blank" rel="noopener" href="http://xn--apps-4m5f5hu47f1man1pb4bux9jduwc.danielhu.cn/v1%E8%BF%99%E4%B8%AAgroup-version%E3%80%82%E8%BF%98%E8%AE%B0%E5%BE%97%E6%88%91%E4%BB%AC%E7%94%A8%E7%9A%84%E5%8F%82%E6%95%B0--group">该目录也就对应了apps.danielhu.cn/v1这个group-version。还记得我们用的参数--group</a> apps吗？group名会自动加上一开始新建项目时使用–domain所指定的danielhu.cn域名，<a target="_blank" rel="noopener" href="http://xn--apps-4m5f5htxz03ar1sqnn7oa.danielhu.cn">所以也就变成了apps.danielhu.cn</a>。</p>
-<p>打开application_types.go文件，有关Copyright部分就不用说了，import部分可以看到只有简单的一行依赖：</p>
+<p>打开<strong>application_types.go文件</strong>，有关Copyright部分就不用说了，import部分可以看到只有简单的一行依赖：</p>
 <pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">import</span> <span class="token punctuation">(</span>
 	metav1 <span class="token string">"k8s.io/apimachinery/pkg/apis/meta/v1"</span>
 <span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
@@ -397,22 +417,22 @@ y<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><s
 	metav1<span class="token punctuation">.</span>ListMeta <span class="token string">`json:"metadata,omitempty"`</span>
 	Items           <span class="token punctuation">[</span><span class="token punctuation">]</span>Application <span class="token string">`json:"items"`</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>Application结构体是Application类型的“根类型”，和其他所有的Kubernetes资源类型一样包含TypeMeta和ObjectMeta。TypeMeta中存放的是当前资源的Kind和APIVersion信息，ObjectMeta中存放的是Name、Namespace、Labels和Annotations等信息。<br>
-而ApplicationList其实只是简单的一个Application集合类型，其中通过Items存放一组Application，用于List之类的批量操作。<br>
-一般情况下，这两个对象都是不需要修改的，我们修改的是前面提到的ApplicationSpec和ApplicationStatus两个结构体。<br>
+<p><strong>Application结构体是Application类型的“根类型”</strong>，和其他所有的Kubernetes资源类型一样包含TypeMeta和ObjectMeta。TypeMeta中存放的是当前资源的Kind和APIVersion信息，ObjectMeta中存放的是Name、Namespace、Labels和Annotations等信息。<br>
+而<strong>ApplicationList其实只是简单的一个Application集合类型</strong>，其中通过Items存放一组Application，用于List之类的批量操作。<br>
+一般情况下，这两个对象都是不需要修改的，<strong>我们修改的是前面提到的ApplicationSpec和ApplicationStatus两个结构体</strong>。<br>
 另外，我们还看到上面的代码中有一行//+kubebuilder:object:root=true这样的特殊注释标记。这个标记主要是被controller-tools识别，然后controller-tools的对象生成器就知道这个标记下面的对象代表一个Kind，接着对象生成器会生成相应的Kind需要的代码，也就是实现runtime.Object接口。换言之，一个结构体要表示一个Kind，必须实现runtime.Object接口。</p>
 <p>最后还有一个init()函数：</p>
 <pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">init</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
 	SchemeBuilder<span class="token punctuation">.</span><span class="token function">Register</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>Application<span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>ApplicationList<span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <h4 id="2-2-自定义新API">2.2 自定义新API</h4>
-<p>接下来定义自己的API，将Application改成需要的样子。如下所示，在ApplicationSpec中添加Deployment和Service属性，类型分别为DeploymentTemplate和ServiceTemplate：</p>
+<p>接下来定义自己的API，将Application改成需要的样子。如下所示，<strong>在ApplicationSpec中添加Deployment和Service属性，类型分别为DeploymentTemplate和ServiceTemplate</strong>：</p>
 <pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token comment">// ApplicationSpec defines the desired state of Application</span>
 <span class="token keyword">type</span> ApplicationSpec <span class="token keyword">struct</span> <span class="token punctuation">&#123;</span>
 	Deployment DeploymentTemplate <span class="token string">`json:"deployment,omitempty"`</span>
 	Service    ServiceTemplate    <span class="token string">`json:"service,omitempty"`</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>下一步是定义DeploymentTemplate和ServiceTemplate。在这里我们简单地引用Kubernetes原生的DeploymentSpec对象和ServiceSpec对象来构造DeploymentTemplate和ServiceTemplate。</p>
+<p>下一步是<strong>定义DeploymentTemplate和ServiceTemplate</strong>。在这里我们简单地引用Kubernetes原生的DeploymentSpec对象和ServiceSpec对象来构造DeploymentTemplate和ServiceTemplate。</p>
 <pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">type</span> DeploymentTemplate <span class="token keyword">struct</span> <span class="token punctuation">&#123;</span>
 	appsv1<span class="token punctuation">.</span>DeploymentSpec <span class="token string">`json:",inline"`</span>
 <span class="token punctuation">&#125;</span>
@@ -428,7 +448,7 @@ y<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><s
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <h3 id="3-实现Application-Controller">3. 实现Application Controller</h3>
 <h4 id="3-1-实现主调谐流程">3.1 实现主调谐流程</h4>
-<p>Application资源定义好之后，当然就要开始写控制器的核心调谐逻辑了。打开controllers/application_controller.go源文件，我们可以看到Reconcile方法的骨架。接下来要实现的调谐逻辑大致如下所示。我们先查看代码，然后对照流程图中的步骤来详细解释：</p>
+<p>Application资源定义好之后，当然就要开始写控制器的核心调谐逻辑了。打开controllers/application_controller.go源文件，我们可以看到Reconcile方法的骨架。接下来要实现的调谐逻辑大致如下所示。我们先查看代码，然后<strong>对照流程图中的步骤来详细解释</strong>：</p>
 <pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>r <span class="token operator">*</span>ApplicationReconciler<span class="token punctuation">)</span> <span class="token function">Reconcile</span><span class="token punctuation">(</span>ctx context<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> req ctrl<span class="token punctuation">.</span>Request<span class="token punctuation">)</span> <span class="token punctuation">(</span>ctrl<span class="token punctuation">.</span>Result<span class="token punctuation">,</span> <span class="token builtin">error</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
 	<span class="token operator">&lt;-</span>time<span class="token punctuation">.</span><span class="token function">NewTicker</span><span class="token punctuation">(</span><span class="token number">100</span> <span class="token operator">*</span> time<span class="token punctuation">.</span>Millisecond<span class="token punctuation">)</span><span class="token punctuation">.</span>C
 	log <span class="token operator">:=</span> log<span class="token punctuation">.</span><span class="token function">FromContext</span><span class="token punctuation">(</span>ctx<span class="token punctuation">)</span>
@@ -823,6 +843,87 @@ make: *** <span class="token punctuation">[</span>manifests<span class="token pu
   <span class="token key atrule">verbs</span><span class="token punctuation">:</span>
   <span class="token punctuation">-</span> get<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <h4 id="3-5-过滤调谐事件">3.5 过滤调谐事件</h4>
+<p>什么情况下调谐逻辑需要被触发执行一次？</p>
+<p><strong>Application创建时</strong>，肯定是需要执行的，也是整个程序逻辑的第一步。<strong>Application发生变更时</strong>，其实需要根据新的Application中的配置来决定是否需要更新已有的Deployment和Service资源实例。目前我们在调谐Deployment和Service时并没有做得那么完善，只考虑了新建的情况。</p>
+<p>再来考虑<strong>Application的Status发生变更时</strong>应该如何处理：明显我们在运行中会根据Deployment和Service资源实例的Status变化来更新Application的Status，如果这时Status更新了，如果再触发一次调谐，其实这次调谐是没有意义的。</p>
+<p>另外，我们也想办法让Deployment和Service的一些变化事件能够选择性地触发调谐逻辑的运行，所以还需要在SetupWithManager()方法中添加一些程序逻辑。</p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token comment">// SetupWithManager sets up the controller with the Manager.</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>r <span class="token operator">*</span>ApplicationReconciler<span class="token punctuation">)</span> <span class="token function">SetupWithManager</span><span class="token punctuation">(</span>mgr ctrl<span class="token punctuation">.</span>Manager<span class="token punctuation">)</span> <span class="token builtin">error</span> <span class="token punctuation">&#123;</span>
+	setupLog <span class="token operator">:=</span> ctrl<span class="token punctuation">.</span>Log<span class="token punctuation">.</span><span class="token function">WithName</span><span class="token punctuation">(</span><span class="token string">"setup"</span><span class="token punctuation">)</span>
+
+	<span class="token keyword">return</span> ctrl<span class="token punctuation">.</span><span class="token function">NewControllerManagedBy</span><span class="token punctuation">(</span>mgr<span class="token punctuation">)</span><span class="token punctuation">.</span>
+		<span class="token function">For</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>dappsv1<span class="token punctuation">.</span>Application<span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">,</span> builder<span class="token punctuation">.</span><span class="token function">WithPredicates</span><span class="token punctuation">(</span>predicate<span class="token punctuation">.</span>Funcs<span class="token punctuation">&#123;</span>
+			CreateFunc<span class="token punctuation">:</span> <span class="token keyword">func</span><span class="token punctuation">(</span>event event<span class="token punctuation">.</span>CreateEvent<span class="token punctuation">)</span> <span class="token builtin">bool</span> <span class="token punctuation">&#123;</span>
+				<span class="token keyword">return</span> <span class="token boolean">true</span>
+			<span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+			DeleteFunc<span class="token punctuation">:</span> <span class="token keyword">func</span><span class="token punctuation">(</span>event event<span class="token punctuation">.</span>DeleteEvent<span class="token punctuation">)</span> <span class="token builtin">bool</span> <span class="token punctuation">&#123;</span>
+				setupLog<span class="token punctuation">.</span><span class="token function">Info</span><span class="token punctuation">(</span><span class="token string">"The Application has been deleted."</span><span class="token punctuation">,</span>
+					<span class="token string">"name"</span><span class="token punctuation">,</span> event<span class="token punctuation">.</span>Object<span class="token punctuation">.</span><span class="token function">GetName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+				<span class="token keyword">return</span> <span class="token boolean">false</span>
+			<span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+			UpdateFunc<span class="token punctuation">:</span> <span class="token keyword">func</span><span class="token punctuation">(</span>event event<span class="token punctuation">.</span>UpdateEvent<span class="token punctuation">)</span> <span class="token builtin">bool</span> <span class="token punctuation">&#123;</span>
+				<span class="token keyword">if</span> event<span class="token punctuation">.</span>ObjectNew<span class="token punctuation">.</span><span class="token function">GetResourceVersion</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> event<span class="token punctuation">.</span>ObjectOld<span class="token punctuation">.</span><span class="token function">GetResourceVersion</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+					<span class="token keyword">return</span> <span class="token boolean">false</span>
+				<span class="token punctuation">&#125;</span>
+				<span class="token keyword">if</span> reflect<span class="token punctuation">.</span><span class="token function">DeepEqual</span><span class="token punctuation">(</span>event<span class="token punctuation">.</span>ObjectNew<span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token operator">*</span>dappsv1<span class="token punctuation">.</span>Application<span class="token punctuation">)</span><span class="token punctuation">.</span>Spec<span class="token punctuation">,</span> event<span class="token punctuation">.</span>ObjectOld<span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token operator">*</span>dappsv1<span class="token punctuation">.</span>Application<span class="token punctuation">)</span><span class="token punctuation">.</span>Spec<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+					<span class="token keyword">return</span> <span class="token boolean">false</span>
+				<span class="token punctuation">&#125;</span>
+				<span class="token keyword">return</span> <span class="token boolean">true</span>
+			<span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+		<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span>
+		<span class="token comment">// 1. Deployment</span>
+		<span class="token function">Owns</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>appsv1<span class="token punctuation">.</span>Deployment<span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">,</span> builder<span class="token punctuation">.</span><span class="token function">WithPredicates</span><span class="token punctuation">(</span>predicate<span class="token punctuation">.</span>Funcs<span class="token punctuation">&#123;</span>
+			CreateFunc<span class="token punctuation">:</span> <span class="token keyword">func</span><span class="token punctuation">(</span>event event<span class="token punctuation">.</span>CreateEvent<span class="token punctuation">)</span> <span class="token builtin">bool</span> <span class="token punctuation">&#123;</span>
+				<span class="token keyword">return</span> <span class="token boolean">false</span>
+			<span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+			DeleteFunc<span class="token punctuation">:</span> <span class="token keyword">func</span><span class="token punctuation">(</span>event event<span class="token punctuation">.</span>DeleteEvent<span class="token punctuation">)</span> <span class="token builtin">bool</span> <span class="token punctuation">&#123;</span>
+				setupLog<span class="token punctuation">.</span><span class="token function">Info</span><span class="token punctuation">(</span><span class="token string">"The Deployment has been deleted."</span><span class="token punctuation">,</span>
+					<span class="token string">"name"</span><span class="token punctuation">,</span> event<span class="token punctuation">.</span>Object<span class="token punctuation">.</span><span class="token function">GetName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+				<span class="token keyword">return</span> <span class="token boolean">true</span>
+			<span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+			UpdateFunc<span class="token punctuation">:</span> <span class="token keyword">func</span><span class="token punctuation">(</span>event event<span class="token punctuation">.</span>UpdateEvent<span class="token punctuation">)</span> <span class="token builtin">bool</span> <span class="token punctuation">&#123;</span>
+				<span class="token keyword">if</span> event<span class="token punctuation">.</span>ObjectNew<span class="token punctuation">.</span><span class="token function">GetResourceVersion</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> event<span class="token punctuation">.</span>ObjectOld<span class="token punctuation">.</span><span class="token function">GetResourceVersion</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+					<span class="token keyword">return</span> <span class="token boolean">false</span>
+				<span class="token punctuation">&#125;</span>
+				<span class="token keyword">if</span> reflect<span class="token punctuation">.</span><span class="token function">DeepEqual</span><span class="token punctuation">(</span>event<span class="token punctuation">.</span>ObjectNew<span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token operator">*</span>appsv1<span class="token punctuation">.</span>Deployment<span class="token punctuation">)</span><span class="token punctuation">.</span>Spec<span class="token punctuation">,</span> event<span class="token punctuation">.</span>ObjectOld<span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token operator">*</span>appsv1<span class="token punctuation">.</span>Deployment<span class="token punctuation">)</span><span class="token punctuation">.</span>Spec<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+					<span class="token keyword">return</span> <span class="token boolean">false</span>
+				<span class="token punctuation">&#125;</span>
+				<span class="token keyword">return</span> <span class="token boolean">true</span>
+			<span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+			GenericFunc<span class="token punctuation">:</span> <span class="token boolean">nil</span><span class="token punctuation">,</span>
+		<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span>
+		<span class="token comment">// 2. Service</span>
+		<span class="token function">Owns</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>corev1<span class="token punctuation">.</span>Service<span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">,</span> builder<span class="token punctuation">.</span><span class="token function">WithPredicates</span><span class="token punctuation">(</span>predicate<span class="token punctuation">.</span>Funcs<span class="token punctuation">&#123;</span>
+			CreateFunc<span class="token punctuation">:</span> <span class="token keyword">func</span><span class="token punctuation">(</span>event event<span class="token punctuation">.</span>CreateEvent<span class="token punctuation">)</span> <span class="token builtin">bool</span> <span class="token punctuation">&#123;</span>
+				<span class="token keyword">return</span> <span class="token boolean">false</span>
+			<span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+			DeleteFunc<span class="token punctuation">:</span> <span class="token keyword">func</span><span class="token punctuation">(</span>event event<span class="token punctuation">.</span>DeleteEvent<span class="token punctuation">)</span> <span class="token builtin">bool</span> <span class="token punctuation">&#123;</span>
+				setupLog<span class="token punctuation">.</span><span class="token function">Info</span><span class="token punctuation">(</span><span class="token string">"The Service has been deleted."</span><span class="token punctuation">,</span>
+					<span class="token string">"name"</span><span class="token punctuation">,</span> event<span class="token punctuation">.</span>Object<span class="token punctuation">.</span><span class="token function">GetName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+				<span class="token keyword">return</span> <span class="token boolean">true</span>
+			<span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+			UpdateFunc<span class="token punctuation">:</span> <span class="token keyword">func</span><span class="token punctuation">(</span>event event<span class="token punctuation">.</span>UpdateEvent<span class="token punctuation">)</span> <span class="token builtin">bool</span> <span class="token punctuation">&#123;</span>
+				<span class="token keyword">if</span> event<span class="token punctuation">.</span>ObjectNew<span class="token punctuation">.</span><span class="token function">GetResourceVersion</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> event<span class="token punctuation">.</span>ObjectOld<span class="token punctuation">.</span><span class="token function">GetResourceVersion</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+					<span class="token keyword">return</span> <span class="token boolean">false</span>
+				<span class="token punctuation">&#125;</span>
+				<span class="token keyword">if</span> reflect<span class="token punctuation">.</span><span class="token function">DeepEqual</span><span class="token punctuation">(</span>event<span class="token punctuation">.</span>ObjectNew<span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token operator">*</span>dappsv1<span class="token punctuation">.</span>Application<span class="token punctuation">)</span><span class="token punctuation">.</span>Spec<span class="token punctuation">,</span> event<span class="token punctuation">.</span>ObjectOld<span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token operator">*</span>dappsv1<span class="token punctuation">.</span>Application<span class="token punctuation">)</span><span class="token punctuation">.</span>Spec<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+					<span class="token keyword">return</span> <span class="token boolean">false</span>
+				<span class="token punctuation">&#125;</span>
+				<span class="token keyword">return</span> <span class="token boolean">true</span>
+			<span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+		<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">.</span>
+		<span class="token function">Complete</span><span class="token punctuation">(</span>r<span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>这里有三块代码逻辑：Application、Deployment和Service。我们逐个进行分析。</p>
+<h5 id="3-5-1-Application">3.5.1 Application</h5>
+<p>对于Application来说，Create事件肯定是无条件处理的；Delete其实不需要做资源清理工作，因为在创建Deployment和Service时都写过类似的代码：</p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">if</span> err <span class="token operator">:=</span> ctrl<span class="token punctuation">.</span><span class="token function">SetControllerReference</span><span class="token punctuation">(</span>app<span class="token punctuation">,</span> newDp<span class="token punctuation">,</span> r<span class="token punctuation">.</span>Scheme<span class="token punctuation">)</span><span class="token punctuation">;</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+	log<span class="token punctuation">.</span><span class="token function">Error</span><span class="token punctuation">(</span>err<span class="token punctuation">,</span> <span class="token string">"Failed to SetControllerReference, will requeue after a short time."</span><span class="token punctuation">)</span>
+	<span class="token keyword">return</span> ctrl<span class="token punctuation">.</span>Result<span class="token punctuation">&#123;</span>RequeueAfter<span class="token punctuation">:</span> GenericRequeueDuration<span class="token punctuation">&#125;</span><span class="token punctuation">,</span> err
+<span class="token punctuation">&#125;</span><span class="token comment">//来自deployment.go</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<p>这些代码的作用就是将当前创建的Deployment资源设置成Application类型的app资源的子资源，这样当对应的Application类型实例被删除时，这个Deployment类型的资源实例就会被系统的垃圾回收系统回收。</p>
+<p>Update时需要获取Application中更新的内容，然后将其应用到已创建好的Deployment和Service资源实例中。为了不使得这个项目过于复杂，我们在这次试验不展开说明这段程序逻辑。<br>
+所以最后For函数应该是这样的：</p>
 <blockquote>
 <p>Notes：</p>
 <p>以上内容均为个人学习过程中的理解，理解和总结可能有偏差。文章内容会随着学习过程不断修改完善。</p>

@@ -132,7 +132,7 @@
 								<li class="file">
 									<a href="/2023/04/28/10.%20%E6%B7%B1%E5%85%A5%E5%AD%A6%E4%B9%A0Client-go%E5%AE%9E%E7%8E%B0%E6%9C%BA%E7%90%86/">
                      
-										    深入学习Client-Go实现机理（进行中）
+										    Client-Go学习与实战
                      
 									</a>
 								</li>
@@ -143,7 +143,7 @@
 								<li class="file">
 									<a href="/2023/04/27/11.%20Operator%E5%BC%80%E5%8F%91%E8%BF%9B%E9%98%B6/">
                      
-										    Operator开发进阶（进行中）
+										    Operator开发进阶
                      
 									</a>
 								</li>
@@ -152,9 +152,20 @@
 			
 							<ul>
 								<li class="file">
-									<a href="/2023/04/28/12.%20Deployment%20Controller%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">
+									<a href="/2023/05/01/12.%20Java%20Client%20Library/">
                      
-										    Deployment Controller源码分析(未开始)
+										    Java Client Library
+                     
+									</a>
+								</li>
+								<div class="article-toc" style="display: none;"></div>
+							</ul>
+			
+							<ul>
+								<li class="file">
+									<a href="/2023/05/01/13.%20Java%E6%96%B0%E5%BB%BAOperator/">
+                     
+										    Java新建Operator
                      
 									</a>
 								</li>
@@ -269,44 +280,14 @@
 		<div id="index">
 	
 		<div class="index-li">
-			<a href="/2023/04/28/12.%20Deployment%20Controller%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">
-				<h2 class="index-title">
-					Deployment Controller源码分析(未开始)
-				</h2>
-				<div class="index-brief">
-					
-Notes：
-以上内容均为个人学习过程中的理解，理解和总结可能有偏差。文章内容会随着学习过程不断修改完善。
-如果以上有错误欢迎指出。
-
-
-					...
-				</div>
-			</a>
-                <div class="article-meta">
-				    <span>2023-04-28</span>
-                    
-                            
-                                
-                                    <span>
-                                        <i class="fa fa-folder" aria-hidden="true"></i>
-                                        <a href="/categories/Kubernetes学习笔记/">Kubernetes学习笔记</a>
-										
-                                    </span>
-                                
-                            
-                    
-                </div>
-		</div>	
-	
-		<div class="index-li">
 			<a href="/2023/04/28/10.%20%E6%B7%B1%E5%85%A5%E5%AD%A6%E4%B9%A0Client-go%E5%AE%9E%E7%8E%B0%E6%9C%BA%E7%90%86/">
 				<h2 class="index-title">
-					深入学习Client-Go实现机理（进行中）
+					Client-Go学习与实战
 				</h2>
 				<div class="index-brief">
-					使用Kubebuilder已经屏蔽了不少client-go的细节，但是要深入Operator开发机制，还是需要对client-go有一定的理解。在GitHub（https://github.com/kubernetes/client-go）上可以找到client-go的源码
-1. client-go
+					client-go是什么
+client-go项目就是用于和Kubernetes API Server通信的Go语言开发工具包。虽然使用Kubebuilder已经屏蔽了不少client-go的细节，但是要深入Operator开发机制，还是需要对client-go有一定的理解。
+client-go的包结
 					...
 				</div>
 			</a>
@@ -390,14 +371,16 @@ Groups和Versions：
 		<div class="index-li">
 			<a href="/2023/04/27/11.%20Operator%E5%BC%80%E5%8F%91%E8%BF%9B%E9%98%B6/">
 				<h2 class="index-title">
-					Operator开发进阶（进行中）
+					Operator开发进阶
 				</h2>
 				<div class="index-brief">
-					一般我们需要将一个应用部署到Kubernetes中时，都会选择用Deployment来管理应用，用Service来做服务发现，进一步可能还需要配置ConfigMap、Ingress、Secret等资源。这么多类型资源的创建、维护、管理工作会变得烦琐且复杂。
+					先复习一下上次的简单实验的流程
 
-部署在K8s中的应用：
+make manifests后并没有做什么操作，只是对文件进行了观察。所以
 
-Deploym
+CRD的配置全都是在application_types.go中完成的。
+CR的配置也都是在config\ samples\ apps_v2_application.yaml中完成的。
+co
 					...
 				</div>
 			</a>
@@ -545,6 +528,33 @@ linux的namespace和另一个资源限制组件
 哪些隔离了，哪些没隔离？
 很多东西其实没做好隔离
 我们在基于容器的开发中
+					...
+				</div>
+			</a>
+                <div class="article-meta">
+				    <span>2023-04-24</span>
+                    
+                            
+                                
+                                    <span>
+                                        <i class="fa fa-folder" aria-hidden="true"></i>
+                                        <a href="/categories/Kubernetes学习笔记/">Kubernetes学习笔记</a>
+										
+                                    </span>
+                                
+                            
+                    
+                </div>
+		</div>	
+	
+		<div class="index-li">
+			<a href="/2023/04/24/3.%20K8s%E6%9C%8D%E5%8A%A1%E6%9A%B4%E9%9C%B2/">
+				<h2 class="index-title">
+					K8s服务暴露
+				</h2>
+				<div class="index-brief">
+					1. Service
+服务暴露就是指把运行在K8s集群中的软件提供的服务（功能）拿出来，在前端发出请求时做出相应的响应。比如我们通常开发的bs应用前端的浏览器页面发出get请求到后端，后端接收到请求后就会计算分析，得到结果，并返回给前端一个html页面。然而在K8s中，应用程序被“层层包裹”，放在了
 					...
 				</div>
 			</a>
