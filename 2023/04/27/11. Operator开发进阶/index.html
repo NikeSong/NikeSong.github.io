@@ -9,7 +9,7 @@
 	
 	<title>
 	
-		Operator开发进阶 | 
+		Operator开发进阶（abort） | 
 	 
 	倪克松的博客
 	</title>
@@ -134,7 +134,7 @@
 								<li class="file">
 									<a href="/2023/04/28/10.%20%E6%B7%B1%E5%85%A5%E5%AD%A6%E4%B9%A0Client-go%E5%AE%9E%E7%8E%B0%E6%9C%BA%E7%90%86/">
                      
-										    Client-Go学习与实战
+										    Client-Go 原理学习
                      
 									</a>
 								</li>
@@ -145,7 +145,7 @@
 								<li class="file active">
 									<a href="/2023/04/27/11.%20Operator%E5%BC%80%E5%8F%91%E8%BF%9B%E9%98%B6/">
                      
-										    Operator开发进阶
+										    Operator开发进阶（abort）
                      
 									</a>
 								</li>
@@ -154,20 +154,9 @@
 			
 							<ul>
 								<li class="file">
-									<a href="/2023/05/01/12.%20Java%20Client%20Library/">
+									<a href="/2023/05/01/12.%20%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AAOperator%E8%BE%93%E5%87%BA%E6%89%80%E6%9C%89Pod%E8%AF%A6%E6%83%85/">
                      
-										    Java Client Library
-                     
-									</a>
-								</li>
-								<div class="article-toc" style="display: none;"></div>
-							</ul>
-			
-							<ul>
-								<li class="file">
-									<a href="/2023/05/01/13.%20Java%E6%96%B0%E5%BB%BAOperator/">
-                     
-										    Java新建Operator
+										    用Java client做一个Operator
                      
 									</a>
 								</li>
@@ -280,7 +269,7 @@
 	<!-- 引入正文 -->
 	<div id="content">
 		<h1 id="article-title">
-	Operator开发进阶
+	Operator开发进阶（abort）
 </h1>
 
 <!-- meta -->
@@ -924,6 +913,7 @@ make: *** <span class="token punctuation">[</span>manifests<span class="token pu
 <p>这些代码的作用就是将当前创建的Deployment资源设置成Application类型的app资源的子资源，这样当对应的Application类型实例被删除时，这个Deployment类型的资源实例就会被系统的垃圾回收系统回收。</p>
 <p>Update时需要获取Application中更新的内容，然后将其应用到已创建好的Deployment和Service资源实例中。为了不使得这个项目过于复杂，我们在这次试验不展开说明这段程序逻辑。<br>
 所以最后For函数应该是这样的：</p>
+<p><strong>不再用Go语言做开发了，后面直接看Client - Java吧</strong></p>
 <blockquote>
 <p>Notes：</p>
 <p>以上内容均为个人学习过程中的理解，理解和总结可能有偏差。文章内容会随着学习过程不断修改完善。</p>

@@ -9,7 +9,7 @@
 	
 	<title>
 	
-		Client-Go学习与实战 | 
+		Client-Go 原理学习 | 
 	 
 	倪克松的博客
 	</title>
@@ -134,7 +134,7 @@
 								<li class="file active">
 									<a href="/2023/04/28/10.%20%E6%B7%B1%E5%85%A5%E5%AD%A6%E4%B9%A0Client-go%E5%AE%9E%E7%8E%B0%E6%9C%BA%E7%90%86/">
                      
-										    Client-Go学习与实战
+										    Client-Go 原理学习
                      
 									</a>
 								</li>
@@ -145,7 +145,7 @@
 								<li class="file">
 									<a href="/2023/04/27/11.%20Operator%E5%BC%80%E5%8F%91%E8%BF%9B%E9%98%B6/">
                      
-										    Operator开发进阶
+										    Operator开发进阶（abort）
                      
 									</a>
 								</li>
@@ -154,20 +154,9 @@
 			
 							<ul>
 								<li class="file">
-									<a href="/2023/05/01/12.%20Java%20Client%20Library/">
+									<a href="/2023/05/01/12.%20%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AAOperator%E8%BE%93%E5%87%BA%E6%89%80%E6%9C%89Pod%E8%AF%A6%E6%83%85/">
                      
-										    Java Client Library
-                     
-									</a>
-								</li>
-								<div class="article-toc" style="display: none;"></div>
-							</ul>
-			
-							<ul>
-								<li class="file">
-									<a href="/2023/05/01/13.%20Java%E6%96%B0%E5%BB%BAOperator/">
-                     
-										    Java新建Operator
+										    用Java client做一个Operator
                      
 									</a>
 								</li>
@@ -280,7 +269,7 @@
 	<!-- 引入正文 -->
 	<div id="content">
 		<h1 id="article-title">
-	Client-Go学习与实战
+	Client-Go 原理学习
 </h1>
 
 <!-- meta -->
@@ -633,16 +622,176 @@ go mod init myproject<span aria-hidden="true" class="line-numbers-rows"><span></
 <p>Reflector的职责很清晰，要做的事情是保持DeltaFIFO中的items持续更新，具体实现是通过ListerWatcher提供的list-watch（列选-监听）能力来列选指定类型的资源，这时会产生一系列Sync事件，然后通过列选到的ResourceVersion来开启监听过程，而监听到新的事件后，会和前面提到的Sync事件一样，都通过DeltaFIFO提供的方法构造相应的DeltaType添加到DeltaFIFO中。当然，前面提到的更新也并不是直接修改DeltaFIFO中已经存在的元素，而是添加一个新的DeltaType到队列中。另外，DeltaFIFO中添加新DeltaType时也会有一定的去重机制，我们在5.3节和5.5节中分别介绍过ListerWatcher和DeltaFIFO组件的工作逻辑，有了这个基础后再看Reflector的工作流就相对轻松很多了。<br>
 这里还有一个细节就是监听过程不是一劳永逸的，监听到新的事件后，会拿着对象的新ResourceVersion重新开启一轮新的监听过程。当然，这里的watch调用也有超时机制，一系列的健壮性措施，所以我们脱离Reflector(Informer)直接使用list-watch还是很难直接写出一套健壮的代码逻辑。</p>
 <h2 id="Informer">Informer</h2>
-<p>在client-go源码分析的最后一节中，我们准备分析Informer。Informer这个词的出镜率很高，我们在很多文章中都可以看到Informer的身影，在源码中真的去找一个叫作Informer的对象，却又发现找不到一个单纯的Informer，但是有很多结构体或者接口中包含Informer这个词。<br>
-与Reflector、WorkQueue等组件不同，Informer相对来说更加模糊，让人初读源码时感觉迷惑。今天我们一起来揭开Informer的面纱，看一下它到底是什么。<br>
-我们在一开始提到过Informer从DeltaFIFO中Pop相应的对象，然后通过Indexer将对象和索引丢到本地cache中，再触发相应的事件处理函数（Resource Event Handlers）的运行。接下来我们通过源码来理解一下整个过程。</p>
-<p>Informer通过一个Controller对象来定义，本身结构很简单，<a target="_blank" rel="noopener" href="http://xn--k8s-ot9dm09a0oq.io/client-go/tools/cache%E5%8C%85%E4%B8%AD%E7%9A%84controller.go%E6%BA%90%E6%96%87%E4%BB%B6%E4%B8%AD%E5%8F%AF%E4%BB%A5%E7%9C%8B%E5%88%B0Controller%E7%9A%84%E5%AE%9A%E4%B9%89%EF%BC%9A">我们在k8s.io/client-go/tools/cache包中的controller.go源文件中可以看到Controller的定义：</a></p>
-<p><img src="../images/controller.png" alt="controller"></p>
-<p>这里有我们熟悉的Reflector，可以猜到Informer启动时会去运行Reflector，从而通过Reflector实现list-watch apiserver，更新“事件”到DeltaFIFO中用于进一步处理。我们继续了解controller对应的Controller接口：</p>
-<p><img src="../images/interface_controller.png" alt="interface_controller"></p>
-<p>这里的核心方法很明显是Run(stopCh&lt;-chan struct{})，Run负责两件事情：<br>
-1）构造Reflector利用ListerWatcher的能力将对象事件更新到DeltaFIFO。<br>
-2）从DeltaFIFO中Pop对象后调用ProcessFunc来处理。</p>
+<p>Informer 主要有两个职责：同步资源状态到本地缓存，保证本地缓存的有效性 —— 对应图中 Reflector 包的 List &amp; Watch 机制监听事件，并调用 ResourceEventHandler 中对应的处理函数（AddFunc、UpdateFunc、DeleteFunc）进行处理（如执行某些自定义逻辑逻辑，如与 Prometheus 对接；或者放入到 workqueue 中，等待 Controller 处理）</p>
+<ul>
+<li>Informer 首先会 list/watch apiserver，Informer 所使用的 Reflector 包负责与 apiserver 建立连接，Reflector 使用 ListAndWatch 的方法，会先从 apiserver 中 list 该资源的所有实例，list 会拿到该对象最新的 resourceVersion，然后使用 watch 方法监听该 resourceVersion 之后的所有变化，若中途出现异常，reflector 则会从断开的 resourceVersion 处重现尝试监听所有变化，一旦该对象的实例有创建、删除、更新动作，Reflector 都会收到”事件通知”，这时，该事件及它对应的 API 对象这个组合，被称为增量（Delta），它会被放进 DeltaFIFO 中。</li>
+<li>Informer 会不断地从这个 DeltaFIFO 中读取增量，每拿出一个对象，Informer 就会判断这个增量的事件类型，然后创建或更新本地的缓存，也就是 store。</li>
+<li>如果事件类型是 Added（添加对象），那么 Informer 会通过 Indexer 的库把这个增量里的 API 对象保存到本地的缓存中，并为它创建索引，若为删除操作，则在本地缓存中删除该对象。</li>
+<li>DeltaFIFO 再 pop 这个事件到 controller 中，controller 会调用事先注册的 ResourceEventHandler 回调函数进行处理。</li>
+<li>在 ResourceEventHandler 回调函数中，其实只是做了一些很简单的过滤，然后将关心变更的 Object 放到 workqueue 里面。</li>
+<li>Controller 从 workqueue 里面取出 Object，启动一个 worker 来执行自己的业务逻辑，业务逻辑通常是计算目前集群的状态和用户希望达到的状态有多大的区别，然后孜孜不倦地让 apiserver 将状态演化到用户希望达到的状态，比如为 deployment 创建新的 pods，或者是扩容/缩容 deployment。</li>
+<li>在worker中就可以使用 lister 来获取 resource，而不用频繁的访问 apiserver，因为 apiserver 中 resource 的变更都会反映到本地的 cache 中。</li>
+<li>此外，在这个过程中，每经过 resyncPeriod 指定的时间，Informer 维护的本地缓存，都会使用最近一次 LIST 返回的结果强制更新一次，从而保证缓存的有效性。在 Kubernetes 中，这个缓存强制更新的操作就叫作：resync。</li>
+</ul>
+<h3 id="Controller案例">Controller案例</h3>
+<h4 id="Infomer-部分">Infomer 部分</h4>
+<ol>
+<li>首先初始化 Informer</li>
+<li>接下来注册 AddEventHandler 的回调函数 （AddFunc、UpdateFunc、DeleteFunc）其作用就是，对 API 对象进行一些过滤处理，然后将关心变更的 object key（namespace 和 name）放入到 workqueue 中其实其对应的函数，不用对 cache 进行同步，Informer 内部具有 cache 同步机制（直接从 Delta FIFO 通过 Indexer 给 Local Store）</li>
+</ol>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token comment">// NewController returns a new student controller</span>
+<span class="token keyword">func</span> <span class="token function">NewController</span><span class="token punctuation">(</span>
+	kubeclientset kubernetes<span class="token punctuation">.</span>Interface<span class="token punctuation">,</span>
+	studentclientset clientset<span class="token punctuation">.</span>Interface<span class="token punctuation">,</span>
+	studentInformer informers<span class="token punctuation">.</span>StudentInformer<span class="token punctuation">)</span> <span class="token operator">*</span>Controller <span class="token punctuation">&#123;</span>
+
+	utilruntime<span class="token punctuation">.</span><span class="token function">Must</span><span class="token punctuation">(</span>studentscheme<span class="token punctuation">.</span><span class="token function">AddToScheme</span><span class="token punctuation">(</span>scheme<span class="token punctuation">.</span>Scheme<span class="token punctuation">)</span><span class="token punctuation">)</span>
+	glog<span class="token punctuation">.</span><span class="token function">V</span><span class="token punctuation">(</span><span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">Info</span><span class="token punctuation">(</span><span class="token string">"Creating event broadcaster"</span><span class="token punctuation">)</span>
+	eventBroadcaster <span class="token operator">:=</span> record<span class="token punctuation">.</span><span class="token function">NewBroadcaster</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	eventBroadcaster<span class="token punctuation">.</span><span class="token function">StartLogging</span><span class="token punctuation">(</span>glog<span class="token punctuation">.</span>Infof<span class="token punctuation">)</span>
+	eventBroadcaster<span class="token punctuation">.</span><span class="token function">StartRecordingToSink</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>typedcorev1<span class="token punctuation">.</span>EventSinkImpl<span class="token punctuation">&#123;</span>Interface<span class="token punctuation">:</span> kubeclientset<span class="token punctuation">.</span><span class="token function">CoreV1</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">Events</span><span class="token punctuation">(</span><span class="token string">""</span><span class="token punctuation">)</span><span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+	recorder <span class="token operator">:=</span> eventBroadcaster<span class="token punctuation">.</span><span class="token function">NewRecorder</span><span class="token punctuation">(</span>scheme<span class="token punctuation">.</span>Scheme<span class="token punctuation">,</span> corev1<span class="token punctuation">.</span>EventSource<span class="token punctuation">&#123;</span>Component<span class="token punctuation">:</span> controllerAgentName<span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+
+	controller <span class="token operator">:=</span> <span class="token operator">&amp;</span>Controller<span class="token punctuation">&#123;</span>
+		kubeclientset<span class="token punctuation">:</span>    kubeclientset<span class="token punctuation">,</span>
+		studentclientset<span class="token punctuation">:</span> studentclientset<span class="token punctuation">,</span>
+		studentsLister<span class="token punctuation">:</span>   studentInformer<span class="token punctuation">.</span><span class="token function">Lister</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+		studentsSynced<span class="token punctuation">:</span>   studentInformer<span class="token punctuation">.</span><span class="token function">Informer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>HasSynced<span class="token punctuation">,</span>
+		workqueue<span class="token punctuation">:</span>        workqueue<span class="token punctuation">.</span><span class="token function">NewNamedRateLimitingQueue</span><span class="token punctuation">(</span>workqueue<span class="token punctuation">.</span><span class="token function">DefaultControllerRateLimiter</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">"Students"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+		recorder<span class="token punctuation">:</span>         recorder<span class="token punctuation">,</span>
+	<span class="token punctuation">&#125;</span>
+
+	glog<span class="token punctuation">.</span><span class="token function">Info</span><span class="token punctuation">(</span><span class="token string">"Setting up event handlers"</span><span class="token punctuation">)</span>
+	<span class="token comment">// Set up an event handler for when Student resources change</span>
+  <span class="token comment">// 正常来说，注册的 `AddEventHandler` 函数监听到资源的变化，会将其更新到本地的 cache，并传送到 workqueue 中</span>
+	studentInformer<span class="token punctuation">.</span><span class="token function">Informer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">AddEventHandler</span><span class="token punctuation">(</span>cache<span class="token punctuation">.</span>ResourceEventHandlerFuncs<span class="token punctuation">&#123;</span>
+		AddFunc<span class="token punctuation">:</span> controller<span class="token punctuation">.</span>enqueueStudent<span class="token punctuation">,</span> <span class="token comment">// 下面有这个函数解释，就是先将对象同步到缓存中，再放入 workqueue 队列</span>
+		UpdateFunc<span class="token punctuation">:</span> <span class="token keyword">func</span><span class="token punctuation">(</span>old<span class="token punctuation">,</span> <span class="token builtin">new</span> <span class="token keyword">interface</span><span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+			oldStudent <span class="token operator">:=</span> old<span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token operator">*</span>bolingcavalryv1<span class="token punctuation">.</span>Student<span class="token punctuation">)</span>
+			newStudent <span class="token operator">:=</span> <span class="token builtin">new</span><span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token operator">*</span>bolingcavalryv1<span class="token punctuation">.</span>Student<span class="token punctuation">)</span>
+			<span class="token keyword">if</span> oldStudent<span class="token punctuation">.</span>ResourceVersion <span class="token operator">==</span> newStudent<span class="token punctuation">.</span>ResourceVersion <span class="token punctuation">&#123;</span>
+                <span class="token comment">//版本一致，就表示没有实际更新的操作，立即返回</span>
+				<span class="token keyword">return</span>
+			<span class="token punctuation">&#125;</span>
+			controller<span class="token punctuation">.</span><span class="token function">enqueueStudent</span><span class="token punctuation">(</span><span class="token builtin">new</span><span class="token punctuation">)</span>
+		<span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+		DeleteFunc<span class="token punctuation">:</span> controller<span class="token punctuation">.</span>enqueueStudentForDelete<span class="token punctuation">,</span>
+	<span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+
+	<span class="token keyword">return</span> controller
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 数据先放入缓存，再入队列</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>c <span class="token operator">*</span>Controller<span class="token punctuation">)</span> <span class="token function">enqueueStudent</span><span class="token punctuation">(</span>obj <span class="token keyword">interface</span><span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	<span class="token keyword">var</span> key <span class="token builtin">string</span>
+	<span class="token keyword">var</span> err <span class="token builtin">error</span>
+	<span class="token comment">// 将对象放入缓存  </span>
+  <span class="token comment">// 其实这一步骤可以省略  informer 会自动同步缓存 cache 的</span>
+	<span class="token keyword">if</span> key<span class="token punctuation">,</span> err <span class="token operator">=</span> cache<span class="token punctuation">.</span><span class="token function">MetaNamespaceKeyFunc</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span><span class="token punctuation">;</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		runtime<span class="token punctuation">.</span><span class="token function">HandleError</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span>
+		<span class="token keyword">return</span>
+	<span class="token punctuation">&#125;</span>
+
+	<span class="token comment">// 将key放入队列</span>
+	c<span class="token punctuation">.</span>workqueue<span class="token punctuation">.</span><span class="token function">AddRateLimited</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 删除操作</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>c <span class="token operator">*</span>Controller<span class="token punctuation">)</span> <span class="token function">enqueueStudentForDelete</span><span class="token punctuation">(</span>obj <span class="token keyword">interface</span><span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	<span class="token keyword">var</span> key <span class="token builtin">string</span>
+	<span class="token keyword">var</span> err <span class="token builtin">error</span>
+	<span class="token comment">// 从缓存中删除指定对象</span>
+	key<span class="token punctuation">,</span> err <span class="token operator">=</span> cache<span class="token punctuation">.</span><span class="token function">DeletionHandlingMetaNamespaceKeyFunc</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		runtime<span class="token punctuation">.</span><span class="token function">HandleError</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span>
+		<span class="token keyword">return</span>
+	<span class="token punctuation">&#125;</span>
+	<span class="token comment">//再将key放入队列</span>
+	c<span class="token punctuation">.</span>workqueue<span class="token punctuation">.</span><span class="token function">AddRateLimited</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h4 id="Controller-部分">Controller 部分</h4>
+<ol>
+<li><code>processNextWorkItem</code> 是从 <code>workqueue</code>中取数据 key</li>
+<li><code>syncHandler</code> 是利用 <code>key</code>从<code>cache</code>获取期望状态，之后再获取实际状态（此代码没有实际编写），之后进行调谐处理，满足期望的状态</li>
+</ol>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>c <span class="token operator">*</span>Controller<span class="token punctuation">)</span> <span class="token function">runWorker</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	<span class="token keyword">for</span> c<span class="token punctuation">.</span><span class="token function">processNextWorkItem</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	<span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 取数据处理</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>c <span class="token operator">*</span>Controller<span class="token punctuation">)</span> <span class="token function">processNextWorkItem</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">bool</span> <span class="token punctuation">&#123;</span>
+
+	obj<span class="token punctuation">,</span> shutdown <span class="token operator">:=</span> c<span class="token punctuation">.</span>workqueue<span class="token punctuation">.</span><span class="token function">Get</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+	<span class="token keyword">if</span> shutdown <span class="token punctuation">&#123;</span>
+		<span class="token keyword">return</span> <span class="token boolean">false</span>
+	<span class="token punctuation">&#125;</span>
+
+	<span class="token comment">// We wrap this block in a func so we can defer c.workqueue.Done.</span>
+	err <span class="token operator">:=</span> <span class="token keyword">func</span><span class="token punctuation">(</span>obj <span class="token keyword">interface</span><span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">)</span> <span class="token builtin">error</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">defer</span> c<span class="token punctuation">.</span>workqueue<span class="token punctuation">.</span><span class="token function">Done</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span>
+		<span class="token keyword">var</span> key <span class="token builtin">string</span>
+		<span class="token keyword">var</span> ok <span class="token builtin">bool</span>
+
+		<span class="token keyword">if</span> key<span class="token punctuation">,</span> ok <span class="token operator">=</span> obj<span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token builtin">string</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token operator">!</span>ok <span class="token punctuation">&#123;</span>
+
+			c<span class="token punctuation">.</span>workqueue<span class="token punctuation">.</span><span class="token function">Forget</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span>
+			runtime<span class="token punctuation">.</span><span class="token function">HandleError</span><span class="token punctuation">(</span>fmt<span class="token punctuation">.</span><span class="token function">Errorf</span><span class="token punctuation">(</span><span class="token string">"expected string in workqueue but got %#v"</span><span class="token punctuation">,</span> obj<span class="token punctuation">)</span><span class="token punctuation">)</span>
+			<span class="token keyword">return</span> <span class="token boolean">nil</span>
+		<span class="token punctuation">&#125;</span>
+		<span class="token comment">// 在syncHandler中处理业务</span>
+		<span class="token keyword">if</span> err <span class="token operator">:=</span> c<span class="token punctuation">.</span><span class="token function">syncHandler</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">;</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+			<span class="token keyword">return</span> fmt<span class="token punctuation">.</span><span class="token function">Errorf</span><span class="token punctuation">(</span><span class="token string">"error syncing '%s': %s"</span><span class="token punctuation">,</span> key<span class="token punctuation">,</span> err<span class="token punctuation">.</span><span class="token function">Error</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+		<span class="token punctuation">&#125;</span>
+
+		c<span class="token punctuation">.</span>workqueue<span class="token punctuation">.</span><span class="token function">Forget</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span>
+		glog<span class="token punctuation">.</span><span class="token function">Infof</span><span class="token punctuation">(</span><span class="token string">"Successfully synced '%s'"</span><span class="token punctuation">,</span> key<span class="token punctuation">)</span>
+		<span class="token keyword">return</span> <span class="token boolean">nil</span>
+	<span class="token punctuation">&#125;</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span>
+
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		runtime<span class="token punctuation">.</span><span class="token function">HandleError</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span>
+		<span class="token keyword">return</span> <span class="token boolean">true</span>
+	<span class="token punctuation">&#125;</span>
+
+	<span class="token keyword">return</span> <span class="token boolean">true</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 处理</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>c <span class="token operator">*</span>Controller<span class="token punctuation">)</span> <span class="token function">syncHandler</span><span class="token punctuation">(</span>key <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token builtin">error</span> <span class="token punctuation">&#123;</span>
+	<span class="token comment">// Convert the namespace/name string into a distinct namespace and name</span>
+	namespace<span class="token punctuation">,</span> name<span class="token punctuation">,</span> err <span class="token operator">:=</span> cache<span class="token punctuation">.</span><span class="token function">SplitMetaNamespaceKey</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		runtime<span class="token punctuation">.</span><span class="token function">HandleError</span><span class="token punctuation">(</span>fmt<span class="token punctuation">.</span><span class="token function">Errorf</span><span class="token punctuation">(</span><span class="token string">"invalid resource key: %s"</span><span class="token punctuation">,</span> key<span class="token punctuation">)</span><span class="token punctuation">)</span>
+		<span class="token keyword">return</span> <span class="token boolean">nil</span>
+	<span class="token punctuation">&#125;</span>
+
+	<span class="token comment">// 从缓存中取对象</span>
+	student<span class="token punctuation">,</span> err <span class="token operator">:=</span> c<span class="token punctuation">.</span>studentsLister<span class="token punctuation">.</span><span class="token function">Students</span><span class="token punctuation">(</span>namespace<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">Get</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		<span class="token comment">// 如果Student对象被删除了，就会走到这里，所以应该在这里加入执行</span>
+		<span class="token keyword">if</span> errors<span class="token punctuation">.</span><span class="token function">IsNotFound</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+			glog<span class="token punctuation">.</span><span class="token function">Infof</span><span class="token punctuation">(</span><span class="token string">"Student对象被删除，请在这里执行实际的删除业务: %s/%s ..."</span><span class="token punctuation">,</span> namespace<span class="token punctuation">,</span> name<span class="token punctuation">)</span>
+
+			<span class="token keyword">return</span> <span class="token boolean">nil</span>
+		<span class="token punctuation">&#125;</span>
+
+		runtime<span class="token punctuation">.</span><span class="token function">HandleError</span><span class="token punctuation">(</span>fmt<span class="token punctuation">.</span><span class="token function">Errorf</span><span class="token punctuation">(</span><span class="token string">"failed to list student by: %s/%s"</span><span class="token punctuation">,</span> namespace<span class="token punctuation">,</span> name<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+		<span class="token keyword">return</span> err
+	<span class="token punctuation">&#125;</span>
+
+	glog<span class="token punctuation">.</span><span class="token function">Infof</span><span class="token punctuation">(</span><span class="token string">"这里是student对象的期望状态: %#v ..."</span><span class="token punctuation">,</span> student<span class="token punctuation">)</span>
+	glog<span class="token punctuation">.</span><span class="token function">Infof</span><span class="token punctuation">(</span><span class="token string">"实际状态是从业务层面得到的，此处应该去的实际状态，与期望状态做对比，并根据差异做出响应(新增或者删除)"</span><span class="token punctuation">)</span>
+
+	c<span class="token punctuation">.</span>recorder<span class="token punctuation">.</span><span class="token function">Event</span><span class="token punctuation">(</span>student<span class="token punctuation">,</span> corev1<span class="token punctuation">.</span>EventTypeNormal<span class="token punctuation">,</span> SuccessSynced<span class="token punctuation">,</span> MessageResourceSynced<span class="token punctuation">)</span>
+	<span class="token keyword">return</span> <span class="token boolean">nil</span>
+<span class="token punctuation">&#125;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p><strong>因为client-go资料比较多，适合入门学习；</strong></p>
+<p><strong>但是因为后期工作针对java展开，以后不再看go语言开发，直接看client-java内容</strong></p>
 <blockquote>
 <p>Notes：</p>
 <p>以上内容均为个人学习过程中的理解，理解和总结可能有偏差。文章内容会随着学习过程不断修改完善。</p>
@@ -656,9 +805,9 @@ go mod init myproject<span aria-hidden="true" class="line-numbers-rows"><span></
     <div class="post-guide">
         <div class="item left">
             
-              <a href="/2023/05/01/12.%20Java%20Client%20Library/">
+              <a href="/2023/05/01/12.%20%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AAOperator%E8%BE%93%E5%87%BA%E6%89%80%E6%9C%89Pod%E8%AF%A6%E6%83%85/">
                   <i class="fa fa-angle-left" aria-hidden="true"></i>
-                  Java Client Library
+                  用Java client做一个Operator
               </a>
             
         </div>
