@@ -9,7 +9,7 @@
 	
 	<title>
 	
-		用Java client做一个Operator | 
+		Operator读取所有的Pod，Deployment,Service | 
 	 
 	倪克松的博客
 	</title>
@@ -121,7 +121,7 @@
 			
 							<ul>
 								<li class="file">
-									<a href="/2023/04/23/1.%20Kubernetes%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/">
+									<a href="/2023/05/10/1.%20Kubernetes%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5.md/">
                      
 										    Kubernetes基本结构
                      
@@ -156,7 +156,29 @@
 								<li class="file active">
 									<a href="/2023/05/01/12.%20%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AAOperator%E8%BE%93%E5%87%BA%E6%89%80%E6%9C%89Pod%E8%AF%A6%E6%83%85/">
                      
-										    用Java client做一个Operator
+										    Operator读取所有的Pod，Deployment,Service
+                     
+									</a>
+								</li>
+								<div class="article-toc" style="display: none;"></div>
+							</ul>
+			
+							<ul>
+								<li class="file">
+									<a href="/2023/05/10/13.%20Flink%E5%AD%A6%E4%B9%A0/">
+                     
+										    Flink
+                     
+									</a>
+								</li>
+								<div class="article-toc" style="display: none;"></div>
+							</ul>
+			
+							<ul>
+								<li class="file">
+									<a href="/2023/05/10/14.%20%E4%BF%AE%E6%94%B9api-server%E4%B8%AD%E7%9A%84%E4%BF%A1%E6%81%AF/">
+                     
+										    配置Kubernetes API Server的连接参数
                      
 									</a>
 								</li>
@@ -269,7 +291,7 @@
 	<!-- 引入正文 -->
 	<div id="content">
 		<h1 id="article-title">
-	用Java client做一个Operator
+	Operator读取所有的Pod，Deployment,Service
 </h1>
 
 <!-- meta -->
@@ -304,7 +326,11 @@
 
 <!-- content -->
 <div id="article-content">
-	<p>新建项目，pom.xml依赖如下所示</p>
+	<p>后面的实战中，咱们的SpringBoot应用会以Pod的形式运行在K8S环境，通过client-java的API操作K8S，而K8S自然不会允许Pod随意对环境中的pod、deployment这些资源进行操作，因此我们要遵照K8S的规范进行RBAC相关的操作；<br>
+K8S的角色设置可以非常详细，但也会更复杂，咱们还是不要花太多时间在这上面吧，这里我选择了使用K8S自带的最高权限的角色：cluster-admin，您可以按照自己的实际情况定制角色，下面是具体操作；<br>
+SSH登录K8S，创建namespace：</p>
+<h1>实验内容</h1>
+<p>新建项目，pom.xml依赖如下所示</p>
 <pre class="line-numbers language-markup" data-language="markup"><code class="language-markup">    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependencies</span><span class="token punctuation">></span></span>
         <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">></span></span>
             <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">></span></span>io.prometheus<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">></span></span>
@@ -379,8 +405,11 @@
 <span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>google<span class="token punctuation">.</span>gson<span class="token punctuation">.</span></span><span class="token class-name">GsonBuilder</span></span><span class="token punctuation">;</span>
 <span class="token keyword">import</span> <span class="token import"><span class="token namespace">io<span class="token punctuation">.</span>kubernetes<span class="token punctuation">.</span>client<span class="token punctuation">.</span>openapi<span class="token punctuation">.</span></span><span class="token class-name">ApiClient</span></span><span class="token punctuation">;</span>
 <span class="token keyword">import</span> <span class="token import"><span class="token namespace">io<span class="token punctuation">.</span>kubernetes<span class="token punctuation">.</span>client<span class="token punctuation">.</span>openapi<span class="token punctuation">.</span></span><span class="token class-name">Configuration</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">io<span class="token punctuation">.</span>kubernetes<span class="token punctuation">.</span>client<span class="token punctuation">.</span>openapi<span class="token punctuation">.</span>apis<span class="token punctuation">.</span></span><span class="token class-name">AppsV1Api</span></span><span class="token punctuation">;</span>
 <span class="token keyword">import</span> <span class="token import"><span class="token namespace">io<span class="token punctuation">.</span>kubernetes<span class="token punctuation">.</span>client<span class="token punctuation">.</span>openapi<span class="token punctuation">.</span>apis<span class="token punctuation">.</span></span><span class="token class-name">CoreV1Api</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">io<span class="token punctuation">.</span>kubernetes<span class="token punctuation">.</span>client<span class="token punctuation">.</span>openapi<span class="token punctuation">.</span>models<span class="token punctuation">.</span></span><span class="token class-name">V1DeploymentList</span></span><span class="token punctuation">;</span>
 <span class="token keyword">import</span> <span class="token import"><span class="token namespace">io<span class="token punctuation">.</span>kubernetes<span class="token punctuation">.</span>client<span class="token punctuation">.</span>openapi<span class="token punctuation">.</span>models<span class="token punctuation">.</span></span><span class="token class-name">V1PodList</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">io<span class="token punctuation">.</span>kubernetes<span class="token punctuation">.</span>client<span class="token punctuation">.</span>openapi<span class="token punctuation">.</span>models<span class="token punctuation">.</span></span><span class="token class-name">V1ServiceList</span></span><span class="token punctuation">;</span>
 <span class="token keyword">import</span> <span class="token import"><span class="token namespace">io<span class="token punctuation">.</span>kubernetes<span class="token punctuation">.</span>client<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span><span class="token class-name">ClientBuilder</span></span><span class="token punctuation">;</span>
 <span class="token keyword">import</span> <span class="token import"><span class="token namespace">io<span class="token punctuation">.</span>kubernetes<span class="token punctuation">.</span>client<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span><span class="token class-name">KubeConfig</span></span><span class="token punctuation">;</span>
 <span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>boot<span class="token punctuation">.</span></span><span class="token class-name">SpringApplication</span></span><span class="token punctuation">;</span>
@@ -407,12 +436,25 @@
 
         <span class="token comment">// 调用客户端API取得所有pod信息</span>
         <span class="token class-name">V1PodList</span> v1PodList <span class="token operator">=</span> api<span class="token punctuation">.</span><span class="token function">listPodForAllNamespaces</span><span class="token punctuation">(</span><span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token keyword">null</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
+        <span class="token comment">// 调用客户端API取得所有Service信息</span>
+        <span class="token class-name">V1ServiceList</span> v1ServiceList <span class="token operator">=</span> api<span class="token punctuation">.</span><span class="token function">listServiceForAllNamespaces</span><span class="token punctuation">(</span><span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token keyword">null</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">// 创建AppsV1Api对象</span>
+        <span class="token class-name">AppsV1Api</span> api1 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">AppsV1Api</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">// 列出所有namespace中的Deployment</span>
+        <span class="token class-name">V1DeploymentList</span> deploymentList <span class="token operator">=</span> api1<span class="token punctuation">.</span><span class="token function">listDeploymentForAllNamespaces</span><span class="token punctuation">(</span><span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token keyword">null</span><span class="token punctuation">,</span> <span class="token keyword">null</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
         <span class="token comment">// 使用jackson将集合对象序列化成JSON，在日志中打印出来</span>
-        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"pod info &#123; "</span> <span class="token operator">+</span> <span class="token keyword">new</span> <span class="token class-name">GsonBuilder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">setPrettyPrinting</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toJson</span><span class="token punctuation">(</span>v1PodList<span class="token punctuation">)</span><span class="token operator">+</span><span class="token string">"&#125;"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">// System.out.println("pod info &#123; " + new GsonBuilder().setPrettyPrinting().create().toJson(v1PodList)+"&#125;");</span>
+        <span class="token comment">// System.out.println("Service info &#123; " + new GsonBuilder().setPrettyPrinting().create().toJson(v1ServiceList)+"&#125;");</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"Deployment info &#123; "</span> <span class="token operator">+</span> <span class="token keyword">new</span> <span class="token class-name">GsonBuilder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">setPrettyPrinting</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toJson</span><span class="token punctuation">(</span>deploymentList<span class="token punctuation">)</span><span class="token operator">+</span><span class="token string">"&#125;"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
     <span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<span class="token punctuation">&#125;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>以上是在master主机上的编写，如果不在master，则把config文件复制一份到某文件夹，并把路径配给kubeConfigPath</p>
+<h1>输出结果</h1>
+<p><img src="/images/pod_info_read.png" alt="pod_info_read"></p>
+<p><img src="images/service_info.png" alt="service_info"></p>
+<p><img src="images/deployment_info.png" alt="deployment_info"></p>
+<p>改编自：<a target="_blank" rel="noopener" href="https://blog.csdn.net/boling_cavalry/article/details/107528068">https://blog.csdn.net/boling_cavalry/article/details/107528068</a></p>
 <blockquote>
 <p>Notes：</p>
 <p>以上内容均为个人学习过程中的理解，理解和总结可能有偏差。文章内容会随着学习过程不断修改完善。</p>
@@ -425,6 +467,11 @@
 
     <div class="post-guide">
         <div class="item left">
+            
+              <a href="/2023/05/10/13.%20Flink%E5%AD%A6%E4%B9%A0/">
+                  <i class="fa fa-angle-left" aria-hidden="true"></i>
+                  Flink
+              </a>
             
         </div>
         <div class="item right">
