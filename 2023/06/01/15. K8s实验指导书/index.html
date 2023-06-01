@@ -92,14 +92,8 @@
       
       
         <li class="menu-item">
-          <a href='https://github.com/wujun234/hexo-theme-tree' class="menu-item-link" target="_blank">
-            Tree
-          </a>
-        </li>
-      
-        <li class="menu-item">
-          <a href='https://github.com/wujun234/uid-generator-spring-boot-starter' class="menu-item-link" target="_blank">
-            UidGenerator
+          <a href='https://github.com/NikeSong' class="menu-item-link" target="_blank">
+            Nicolson
           </a>
         </li>
       
@@ -349,12 +343,12 @@
 <p>双击“Docker Desktop Installer.exe”，页面打开点击ok，一路均选择确定和ok进行安装即可。</p>
 <h3 id="1-2【提示报错】错误解决1">1.2【提示报错】错误解决1</h3>
 <p>如果未报错则安装成功，可跳过此部分看1.3。下图中前方系统报错框可能出现也可能不出现，提示内容相同，均为“hardware assisted vitualization”和“data execution protection”。</p>
-<p>​                               <img src="../images/exp1.png" alt="exp1"></p>
+<p>​                               <img src="/images/exp1.png" alt="exp1"></p>
 <p>错误解决方式如下：</p>
 <ol>
 <li>打开控制面板-&gt;程序-&gt;启用或关闭 windows 功能，开启 Windows 虚拟化和 Linux 子系统（WSL2)。</li>
 </ol>
-<p><img src="../images/exp2.png" alt="exp2"></p>
+<p><img src="/images/exp2.png" alt="exp2"></p>
 <ol start="2">
 <li>
 <p>安装linux内核，去微软商店Microsoft Store搜索Linux进行安装，选择Ubuntu或者Debian都可以，建议安装Ununtu20.XX。如果无法打开微软商店，参考附录链接1。</p>
@@ -369,13 +363,13 @@ wsl.exe --set-default-version <span class="token number">2</span>
 
 wsl.exe <span class="token parameter variable">--list</span> –verbose<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>应该如下图，可以看到一个 Linux 系统，名字你的不一定跟我的一样，看你安装的是什么版本。VERSION应该是2。</p>
-<p><img src="../images/exp3.png" alt="exp3"></p>
+<p><img src="/images/exp3.png" alt="exp3"></p>
 <p>\4.   确保 BIOS 已开启虚拟化，下图检查是否已开启好。如果是已禁用，请在开机时按F2进入BIOS开启一下，不会设置的可以网上搜索下自己主板的设置方法，Intel和AMD的设置可能稍有不同</p>
-<p><img src="../images/exp4.png" alt="exp4"></p>
+<p><img src="/images/exp4.png" alt="exp4"></p>
 <p>\5. 以上操作部分需要重启电脑才能有效。</p>
 <h3 id="1-3【提示报错】错误解决2">1.3【提示报错】错误解决2</h3>
 <p><strong>出现下图错误，点击链接安装最新版本的</strong> <strong>WSL2</strong>，见链接2。</p>
-<p><img src="../images/exp5.png" alt="exp5"></p>
+<p><img src="/images/exp5.png" alt="exp5"></p>
 <h3 id="1-4修改Docker镜像">1.4修改Docker镜像</h3>
 <table>
 <thead>
@@ -420,7 +414,7 @@ wsl.exe <span class="token parameter variable">--list</span> –verbose<span ari
 </tbody>
 </table>
 <p>在打开的软件中选择进入如下界面，在引擎中加入上表中的镜像加速地址。格式如下：“registry-mirrors”: [“<a target="_blank" rel="noopener" href="https://registry.docker-cn.com">https://registry.docker-cn.com</a>”]。</p>
-<p><img src="../images/exp6.png" alt="exp6"></p>
+<p><img src="/images/exp6.png" alt="exp6"></p>
 <h2 id="2-安装-Kubernetes">2.安装 Kubernetes</h2>
 <p>minikube是一个K8S集群模拟器，提供一个节点的集群，master和worker可以在同一个主机上部署使用，不需要两台机器（主节点、工作节点个一台），操作简单，适合实验分析。</p>
 <p>首先，把Docker运行起来，再次检查镜像是否配置为国内（之前配过也要检查），如果没有，应在引擎中添加如下字段。</p>
@@ -443,12 +437,12 @@ wsl.exe <span class="token parameter variable">--list</span> –verbose<span ari
 <p>打开Power Shell，输入以下代码来下载和运行最新版本的安装包：</p>
 <pre class="line-numbers language-powershell" data-language="powershell"><code class="language-powershell"><span class="token function">New-Item</span> <span class="token operator">-</span>Path <span class="token string">'c:\'</span> <span class="token operator">-</span>Name <span class="token string">'minikube'</span> <span class="token operator">-</span>ItemType Directory <span class="token operator">-</span>Force  <span class="token function">Invoke-WebRequest</span> <span class="token operator">-</span>OutFile <span class="token string">'c:\minikube\minikube.exe'</span> <span class="token operator">-</span>Uri  <span class="token string">'https://github.com/kubernetes/minikube/releases/latest/download/minikube-windows-amd64.exe'</span>  <span class="token operator">-</span>UseBasicParsing  <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <p>开始下载的界面如下，需要稍等其下载完成。</p>
-<p><img src="../images/exp7.png" alt="exp7"></p>
+<p><img src="/images/exp7.png" alt="exp7"></p>
 <p>添加minikube.exe到path目录，只需要在以管理员权限打开的Power Shell里输入以下命令：</p>
 <pre class="line-numbers language-powershell" data-language="powershell"><code class="language-powershell"><span class="token variable">$oldPath</span> = <span class="token namespace">[Environment]</span>::GetEnvironmentVariable<span class="token punctuation">(</span><span class="token string">'Path'</span><span class="token punctuation">,</span>  <span class="token namespace">[EnvironmentVariableTarget]</span>::Machine<span class="token punctuation">)</span>  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">$oldPath</span><span class="token punctuation">.</span>Split<span class="token punctuation">(</span><span class="token string">';'</span><span class="token punctuation">)</span> <span class="token operator">-</span>inotcontains <span class="token string">'C:\minikube'</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span> `     <span class="token namespace">[Environment]</span>::SetEnvironmentVariable<span class="token punctuation">(</span><span class="token string">'Path'</span><span class="token punctuation">,</span> $<span class="token punctuation">(</span><span class="token string">'&#123;0&#125;;C:\minikube'</span> <span class="token operator">-</span>f  <span class="token variable">$oldPath</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token namespace">[EnvironmentVariableTarget]</span>::Machine<span class="token punctuation">)</span> `  <span class="token punctuation">&#125;</span>  <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <p>启动集群，使用命令：minikube start --kubernetes-version=v1.23.0。出现带有彩色表情包的字串，因为仍需要下载一部分内容，所以需要等待一段时间。直到显示done！ Kubectl is now…。最后显示部分红色报错不需理会。</p>
 <p>此时在docker中可以看到多了一个镜像，出现minikube容器，如下图所示。</p>
-<p><img src="../images/exp8.png" alt="exp8"></p>
+<p><img src="/images/exp8.png" alt="exp8"></p>
 <p>常用命令如下表所示。</p>
 <table>
 <thead>
@@ -504,14 +498,14 @@ wsl.exe <span class="token parameter variable">--list</span> –verbose<span ari
 </li>
 </ul>
 <p><strong>镜像</strong>可以理解为软件安装包，可以方便的进行传播和安装。<strong>容器</strong>是指软件安装后的状态，每个软件及其运行环境组成的整体都是独立的、隔离的，称之为容器。</p>
- <img src="../images/exp9.png" alt="exp9" style="zoom:50%;" />
+ <img src="/images/exp9.png" alt="exp9" style="zoom:50%;" />
 <p>Docker的作用就如他标志图片中的鲸鱼，而上面的集装箱就是打包部署的应用程序，Docker隔离了每个系统之间的环境差异性，使配置变得简单，始终如一。</p>
 <h3 id="3-2-k8s的作用">3.2 k8s的作用</h3>
 <p>当你的应用只是跑在一台机器，直接一个 docker + docker-compose 就够了。</p>
 <p>当你的应用需要跑在3，4台机器上，你依旧可以每台机器单独配置运行环境+负载均衡器；</p>
 <p>当你应用访问数不断增加，机器逐渐增加到十几台、上百台、上千台时，每次加机器、软件更新、版本回滚，都会变得非常麻烦、痛不欲生，把时间都浪费在那些没技术含量的重复性工作上。</p>
 <p>这时候，Kubernetes 就可以一展身手了，让你轻松管理百万千万台机器的集群。Kubernetes可以为你提供集中式的管理集群机器和应用，加机器、版本升级、版本回滚，那都是一个命令就搞定的事，不停机的灰度更新，确保高可用、高性能、高扩展。</p>
-<p><img src="../images/exp10.jpg" alt="exp10"></p>
+<p><img src="/images/exp10.jpg" alt="exp10"></p>
 <p>Pod的含义是豆荚，它是K8S调度、管理的最小单位，一个Pod可以包含一个或多个容器（Docker），每个Pod有自己的虚拟IP。一个工作节点（Node）可以有多个pod，主节点会考量负载自动调度pod到哪个节点运行。</p>
 <p>Pod由Pod Controller来控制和监督，同一个Controller控制的多个Pod可以认为工作在一个“控制平面”上（其实控制平面是个抽象概念，并不真的存在这个组件，第四章会做进一步解释）。</p>
 <h3 id="3-2项目部署">3.2项目部署</h3>
@@ -520,7 +514,7 @@ wsl.exe <span class="token parameter variable">--list</span> –verbose<span ari
 <p>应用的作用为，当其运行在某个pod上时，可以在网页打印所在pod的信息。下面通过例子实现pod的部署，保证Docker打开，使用minikube start 启动集群，打开打开Power Shell，输入以下命令。</p>
 <p>kubectl run testapp --image=<a target="_blank" rel="noopener" href="http://ccr.ccs.tencentyun.com/k8s-tutorial/test-k8s:v1">ccr.ccs.tencentyun.com/k8s-tutorial/test-k8s:v1</a></p>
 <p>此命令含义为运行一个pod取名为testapp，镜像地址为本次实验项目地址。此时查询pod数量，使用命令kubectl get pod，会显示如下信息：</p>
-<p><img src="../images/exp11.png" alt="exp11"></p>
+<p><img src="/images/exp11.png" alt="exp11"></p>
 <p>一般在集群里面应该有很多的pod，我们写一个deployment文件，用以创建和管理大量pod。打开记事本，把以下内容写入，并讲文件重命名为app.yaml。</p>
 <pre class="line-numbers language-yaml" data-language="yaml"><code class="language-yaml"><span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> apps/v1
 <span class="token key atrule">kind</span><span class="token punctuation">:</span> Deployment
@@ -544,26 +538,26 @@ wsl.exe <span class="token parameter variable">--list</span> –verbose<span ari
       <span class="token punctuation">-</span> <span class="token key atrule">name</span><span class="token punctuation">:</span> test<span class="token punctuation">-</span>k8s <span class="token comment"># 容器名字</span>
         <span class="token key atrule">image</span><span class="token punctuation">:</span> ccr.ccs.tencentyun.com/k8s<span class="token punctuation">-</span>tutorial/test<span class="token punctuation">-</span>k8s<span class="token punctuation">:</span>v1 <span class="token comment"># 镜像</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>在此文件的文件夹下打开Power Shell，输入kubectl apply -f .\app.yaml创建deployment，通过命令kubectl get deployment查询刚才创建的deployment，再次通过kubectl get pod命令可以看到正在运行的pod，其中多个以test-k8s开头。</p>
-<p><img src="../images/exp12.png" alt="exp12"></p>
+<p><img src="/images/exp12.png" alt="exp12"></p>
 <p>可以通过kubectl describe pod +pod名获得某个pod的详细数据，使用kubectl logs + pod名查看某pod的日志。</p>
 <p>通过命令修改deployment的pod数量为10个，使用kubectl scale deployment test-k8s --replicas=10，再次查询pod数量，看到以test-k8s开头的pod数目变为10个。选择一个pod，将其集群端口映射到计算机端口kubectl port-forward +pod名+ 8080:8080，打开浏览器，网址输入http://localhost:8080回车后看到浏览器左上角出现如下界面为操作成功。</p>
-<p><img src="../images/exp13.png" alt="exp13"></p>
+<p><img src="/images/exp13.png" alt="exp13"></p>
 <p>原Power Shell无法输入新命令，不要关闭此页面，此时新建一个Power Shell使用命令kubectl logs +pod名+ -f持续观察pod日志，每刷新一次浏览器页面日志都会更新。</p>
-<p><img src="../images/exp14.png" alt="exp14"></p>
+<p><img src="/images/exp14.png" alt="exp14"></p>
 <h2 id="4-K8s框架学习及资源部署">4. K8s框架学习及资源部署</h2>
 <h3 id="4-1-K8s基本组件学习">4.1 K8s基本组件学习</h3>
-<p><img src="../images/exp15.png" alt="exp15"></p>
+<p><img src="/images/exp15.png" alt="exp15"></p>
 <p>首先，一个基本的Kubernetes集群由若干个Master节点和若干个Node节点组成。Master相当于集群的大脑，做集群的规划和控制，核心的控制组件都会部署到Mater节点上。Node节点是实际运行程序的工作节点。 下面是K8s整体框架图，大家可以先对它有个印象，后面逐次介绍各个组件的功能。</p>
-<p><img src="../images/exp16.png" alt="exp16"></p>
+<p><img src="/images/exp16.png" alt="exp16"></p>
 <p>首先从Node节点看起。</p>
-<p><img src="../images/exp17.png" alt="exp17"></p>
+<p><img src="/images/exp17.png" alt="exp17"></p>
 <p>Node方块中的最小单位是Pod，Pod直译为豆荚，是K8s控制和调度的最小单位，也是一切工作的关注核心。理解为豆荚是非常直观的，因为这里面运行了一个个的容器，每个容器可以理解为一个豆子。容器中运行着我们部署的程序。看我下面画的是不是挺像豌豆 :-)</p>
-<p><img src="../images/exp18.png" alt="exp18"></p>
+<p><img src="/images/exp18.png" alt="exp18"></p>
 <p>为了实现pod的灵活控制，我们把pod做了分组，交由pod controller管理。pod controller其实是Master中的Controller Manager提供的功能。一个pod controller保存了其下属的pod的模板，拿到了pod controller我们就可以随意的创建、销毁、修改一组pod。当pod controller下属的pod被删除或者出故障后，pod controller会重建一个pod代替它。</p>
 <p>pod随时可能被销毁和重建，为了保证pod中应用程序的数据安全，把数据存储在pvc中。pvc它是k8s提供的存储服务，pvc中的数据未必就存储在当前机器上，它相当于是一个服务接口，其实现可以是各异的（这种情况就类似于一个Java接口有很多实现类，用不同的方式实现了安全的存储，但是这些你无需关心，调接口即可）。</p>
 <p>namespace的功能就是实现pod等资源的隔离，在某namespace中看不到其他namespace中的资源。</p>
 <p>下面我们先换个角度，从Master看起。</p>
-<p><img src="../images/exp19.png" alt="exp19"></p>
+<p><img src="/images/exp19.png" alt="exp19"></p>
 <p>Kubectl是我们控制集群的工具，命令行交互工具。我们所有的控制命令都是通过这个组件下发到集群中的，这个组件在Master节点和Node节点上都可以存在，所以这里我把它画在了外部。</p>
 <p>Api server是Master中最核心的控制组件，其他组件都需要通过和他做交互实现相应的功能。这里的“功能”几乎涉及了k8s的各种服务，比如pod的创建、销毁、调度，服务的暴露等。</p>
 <p>Controller Manager就是Node中Pod Controller功能的实现根基。</p>
@@ -605,14 +599,14 @@ kube-system   kube-scheduler-master            1&#x2F;1     Running   0         
 <p>三个镜像中分别运行一个程序，一个是“listener”，它监听本机的5000端口，当它收到其他进程发来的“音乐家已就位！”和“场地布置完毕！”指令后就会输出“演唱会开始！”指令，代表演唱会成功开始，否则它只会发出自己接到了的信号；第二个“musician”镜像部署的应用存活20秒后开始每隔两秒向本机5000端口发送一次“音乐家已就位！”；第三个“venue”镜像在存活10秒后每隔两秒向本机5000端口发送“场地布置完毕！”。</p>
 <p>你的任务是编写一个yaml文件（新建文本文件，编写内容后更改后缀名为yaml），这个文件的描述对象是一个Pod，Pod中有三个镜像，分别是上面提到的“listener”，“musician”，“venue”。其中“listener”工作在5000端口。listener的镜像地址为“<a target="_blank" rel="noopener" href="http://registry.cn-hangzhou.aliyuncs.com/network_class/experi:proj1-1.2%E2%80%9D%EF%BC%8Cmusician%E7%9A%84%E9%95%9C%E5%83%8F%E5%9C%B0%E5%9D%80%E4%B8%BA%E2%80%9Cregistry.cn-hangzhou.aliyuncs.com/network_class/experi:proj2-1.3%E2%80%9D%EF%BC%8Cvenue%E7%9A%84%E9%95%9C%E5%83%8F%E5%9C%B0%E5%9D%80%E4%B8%BA%E2%80%9Cregistry.cn-hangzhou.aliyuncs.com/network_class/experi:proj3-1.3%E2%80%9D%EF%BC%8CPod%E5%BA%94%E8%AF%A5%E8%BF%90%E8%A1%8C%E5%9C%A8%E7%9A%84%E5%91%BD%E5%90%8D%E7%A9%BA%E9%97%B4%E4%B8%BA%E2%80%9Cdev%E2%80%9D%E3%80%82">registry.cn-hangzhou.aliyuncs.com/network_class/experi:proj1-1.2”，musician的镜像地址为“registry.cn-hangzhou.aliyuncs.com/network_class/experi:proj2-1.3”，venue的镜像地址为“registry.cn-hangzhou.aliyuncs.com/network_class/experi:proj3-1.3”，Pod应该运行在的命名空间为“dev”。</a></p>
 <p>编写好yaml文件后在K8s中创建dev空间：kubectl create namespace dev。然后输入kubectl get namespace，可以看到如下结果说明创建成功。</p>
-<p><img src="../images/exp20.png" alt="exp20"></p>
+<p><img src="/images/exp20.png" alt="exp20"></p>
 <p>然后在命令行下cd到你创建的yaml文件目录下，输入kubectl apply -f threepod.yaml（假设你编写的yaml文件名为threepod.yaml）即可创建相应资源。</p>
-<p><img src="../images/exp21.png" alt="exp21"></p>
+<p><img src="/images/exp21.png" alt="exp21"></p>
 <p>如果你的yaml没问题，此时musician和venue线程已经开始倒数了，快速输入kubectl logs -f three-contanier -n dev（假设你创建的pod名为three-contanier），如果你在十秒之内输入了这个指令，就可以看到listener一开始没有TCP连接，十秒后接收到场地布置完毕的消息，之后每两秒重复一次已经收到的场地信息，直到二十秒左右收到音乐家就位的信息，于是演唱会就正式开始啦！</p>
-<p><img src="../images/exp22.png" alt="exp22"></p>
+<p><img src="/images/exp22.png" alt="exp22"></p>
 <p>如果你没赶上十秒和二十秒的过程，可以按ctrl+c退出监听，输入kubectl delete pod three-contanier -n dev删除pod，然后重新建立pod，用kubectl apply -f threepod.yaml重新创建Pod，然后再尝试kubectl logs -f three-contanier -n dev。</p>
 <p>如果你的运行出现问题，可以使用kubectl describe pod three-contanier -n dev查看pod创建日志有什么问题（在最下面），正常情况如下图，建议放大观看。</p>
-<p><img src="../images/exp23.png" alt="exp23"></p>
+<p><img src="/images/exp23.png" alt="exp23"></p>
 <h2 id="附录：">附录：</h2>
 <p>链接1：</p>
 <p><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_42220935/article/details/104714114">https://blog.csdn.net/qq_42220935/article/details/104714114</a></p>
