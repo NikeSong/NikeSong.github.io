@@ -10,16 +10,6 @@ $(document).ready(function () {
   wrapImageWithFancyBox();
 });
 
-const container = document?.getElementById('container')
-const codeBlocks = container?.getElementsByTagName('pre') Array.from(codeBlocks).forEach(item => {
-  item.style.whiteSpace = 'pre-wrap'
-  // Add pre-mac element for Mac Style UI
-  const preMac = document.createElement('div')
-  preMac.classList.add('pre-mac')
-  preMac.innerHTML = '<span></span><span></span><span></span>'
-  item.parentElement.insertBefore(preMac, item)
-}) 
-
 // 页面滚动
 function pageScroll() {
   var start_hight = 0;
@@ -345,7 +335,6 @@ function scrollOff() {
  * Wrap images with fancybox support.
  */
 function wrapImageWithFancyBox() {
-
   $('img').not('#header img').each(function () {
     var $image = $(this);
     var imageCaption = $image.attr('alt');
@@ -379,10 +368,4 @@ function wrapImageWithFancyBox() {
       autoStart: false
     }
   });
-  $('img').css({
-  'max-width': '600px',
-  'max-height': '500px',
-  'display': 'block',
-  'margin': '0 auto'
-});
 }
